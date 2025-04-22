@@ -163,7 +163,6 @@ class _PsychologistHomePage extends State<PsychologistHomePage> {
                         const SizedBox(
                           height: 10,
                         ),
-            
                         const SizedBox(
                           height: 10,
                         ),
@@ -223,11 +222,23 @@ class _PsychologistHomePage extends State<PsychologistHomePage> {
                                           level = '';
                                           break;
                                         case 'Inicial':
-                                          gradeList = [ 'Cualquiera', '1ra sección','2da sección'];
+                                          gradeList = [
+                                            'Cualquiera',
+                                            '1ra sección',
+                                            '2da sección'
+                                          ];
                                           level = value!;
                                           break;
-                                        default: 
-                                          gradeList = ['Cualquiera', '1er','2do','3er','4to','5to', '6to'];                                          
+                                        default:
+                                          gradeList = [
+                                            'Cualquiera',
+                                            '1er',
+                                            '2do',
+                                            '3er',
+                                            '4to',
+                                            '5to',
+                                            '6to'
+                                          ];
                                           level = value!;
                                       }
                                       setState(() {});
@@ -242,7 +253,7 @@ class _PsychologistHomePage extends State<PsychologistHomePage> {
                                 const SizedBox(width: 20),
                                 Expanded(
                                   child: DropdownButtonFormField<String>(
-                                    value: grade == '' ? 'Cualquiera': grade,
+                                    value: grade == '' ? 'Cualquiera' : grade,
                                     isDense: true,
                                     decoration: customDecoration('Curso'),
                                     items: gradeList.map((String value) {
@@ -267,8 +278,7 @@ class _PsychologistHomePage extends State<PsychologistHomePage> {
                                   ),
                                 ),
                               ],
-                            )
-                          ),
+                            )),
                         const SizedBox(
                           height: 10,
                         ),
@@ -350,111 +360,155 @@ class _PsychologistHomePage extends State<PsychologistHomePage> {
                               minWidth: 600.0,
                             ),
                             child: SingleChildScrollView(
-                              scrollDirection: Axis.vertical,
-                              child: filterList.isEmpty
-                                ? const Center(
-                                    child: Text(
-                                      'No hay postulaciones',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Color(0xFF044086),
-                                          fontSize: 18),
-                                    ),
-                                  )
-                                : Center(
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: DataTable(
-                                      columns: const [
-                                        DataColumn(
-                                            label: Text('Postulante',
-                                                style: TextStyle(
-                                                    color: Color(0xFF044086),
-                                                    fontWeight:
-                                                        FontWeight.bold))),
-                                        DataColumn(
-                                            label: Text('Nivel',
-                                                style: TextStyle(
-                                                    color: Color(0xFF044086),
-                                                    fontWeight:
-                                                        FontWeight.bold))),
-                                        DataColumn(
-                                            label: Text('Grado',
-                                                style: TextStyle(
-                                                    color: Color(0xFF044086),
-                                                    fontWeight:
-                                                        FontWeight.bold))),
-                                        DataColumn(
-                                            label: Text('Fecha de entrevista',
-                                                style: TextStyle(
-                                                    color: Color(0xFF044086),
-                                                    fontWeight:
-                                                        FontWeight.bold))),
-                                        DataColumn(label: Text('')),
-                                      ],
-                                      rows: filterList.map((postulation) {
-                                        return DataRow(
-                                          cells: [
-                                            DataCell(Text(
-                                                '${postulation.student_name} ${postulation.student_lastname}')),
-                                            DataCell(Text(postulation.level)),
-                                            DataCell(Text(postulation.grade)),
-                                            DataCell(Text(
-                                                DateFormat('dd/MM/yyyy')
-                                                    .format(postulation
-                                                        .interview_date))),
-                                            DataCell(
-                                              ElevatedButton(
-                                                onPressed: () async {
-                                                  final recargar =
-                                                      await Navigator.of(
-                                                              context)
-                                                          .pushNamed(
-                                                              '/postulation_details_psychology',
-                                                              arguments: {
-                                                        'id': postulation.id
-                                                      });
-                                                  if (recargar != null) {
-                                                    setState(() {
-                                                      isLoading = true;
-                                                    });
-                                                    postulationRemoteDatasourceImpl
-                                                        .getPostulations()
-                                                        .then((value) => {
-                                                              postulations =
-                                                                  value,
-                                                              level = '',
-                                                              grade = '',
-                                                              searchController
-                                                                  .text = '',
-                                                              filterList = FilterPostulationsList(
-                                                                  status,
-                                                                  level,
-                                                                  grade,
-                                                                  searchController
-                                                                      .text
-                                                                      .trim()),
-                                                              if (mounted)
-                                                                {
-                                                                  setState(
-                                                                      () {
-                                                                    isLoading =
-                                                                        false;
-                                                                  })
-                                                                }
+                                scrollDirection: Axis.vertical,
+                                child: filterList.isEmpty
+                                    ? const Center(
+                                        child: Text(
+                                          'No hay postulaciones',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              color: Color(0xFF044086),
+                                              fontSize: 18),
+                                        ),
+                                      )
+                                    : Center(
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: DataTable(
+                                            columns: const [
+                                              DataColumn(
+                                                  label: Text('Postulante',
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xFF044086),
+                                                          fontWeight: FontWeight
+                                                              .bold))),
+                                              DataColumn(
+                                                  label: Text('Nivel',
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xFF044086),
+                                                          fontWeight: FontWeight
+                                                              .bold))),
+                                              DataColumn(
+                                                  label: Text('Grado',
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xFF044086),
+                                                          fontWeight: FontWeight
+                                                              .bold))),
+                                              DataColumn(
+                                                  label: Text(
+                                                      'Fecha de entrevista',
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xFF044086),
+                                                          fontWeight: FontWeight
+                                                              .bold))),
+                                              DataColumn(label: Text('')),
+                                            ],
+                                            rows: filterList.map((postulation) {
+                                              return DataRow(
+                                                cells: [
+                                                  DataCell(
+                                                    Text(
+                                                      '${postulation.student_name} ${postulation.student_lastname}',
+                                                      style: const TextStyle(
+                                                          fontSize: 14),
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    Text(
+                                                      postulation.level,
+                                                      style: const TextStyle(
+                                                          fontSize: 14),
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    Text(
+                                                      postulation.grade,
+                                                      style: const TextStyle(
+                                                          fontSize: 14),
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    Text(
+                                                      DateFormat('dd/MM/yyyy')
+                                                          .format(postulation
+                                                              .interview_date),
+                                                      style: const TextStyle(
+                                                          fontSize: 14),
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    SizedBox(
+                                                      width: 100,
+                                                      child: ElevatedButton(
+                                                        style: ButtonStyle(
+                                                          padding:
+                                                              MaterialStateProperty
+                                                                  .all(
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 10),
+                                                          ),
+                                                        ),
+                                                        onPressed: () async {
+                                                          final recargar =
+                                                              await Navigator.of(
+                                                                      context)
+                                                                  .pushNamed(
+                                                                      '/postulation_details_psychology',
+                                                                      arguments: {
+                                                                'id':
+                                                                    postulation
+                                                                        .id
+                                                              });
+                                                          if (recargar !=
+                                                              null) {
+                                                            setState(() {
+                                                              isLoading = true;
                                                             });
-                                                  }
-                                                },
-                                                child: const Text('Ver'),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                )                                  
-                            ),
+                                                            postulationRemoteDatasourceImpl
+                                                                .getPostulations()
+                                                                .then(
+                                                                    (value) => {
+                                                                          postulations =
+                                                                              value,
+                                                                          level =
+                                                                              '',
+                                                                          grade =
+                                                                              '',
+                                                                          searchController.text =
+                                                                              '',
+                                                                          filterList = FilterPostulationsList(
+                                                                              status,
+                                                                              level,
+                                                                              grade,
+                                                                              searchController.text.trim()),
+                                                                          if (mounted)
+                                                                            {
+                                                                              setState(() {
+                                                                                isLoading = false;
+                                                                              })
+                                                                            }
+                                                                        });
+                                                          }
+                                                        },
+                                                        child: const Text(
+                                                          'Ver',
+                                                          style: TextStyle(
+                                                              fontSize: 14),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                      )),
                           ),
                         ),
                         const SizedBox(

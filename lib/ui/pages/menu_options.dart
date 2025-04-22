@@ -44,7 +44,6 @@ class OptionsMenuPage extends StatelessWidget {
                 Navigator.pushNamed(context, '/admin_dashboard');
               },
             ),
-           
             CardOption(
               title: 'Registro de Licencias',
               imageUrl: 'licencia',

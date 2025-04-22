@@ -21,7 +21,10 @@ import 'dart:typed_data';
 import 'dart:html' as html;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter/services.dart' show FilteringTextInputFormatter, TextInputFormatter, rootBundle;
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:flutter/services.dart'
+    show FilteringTextInputFormatter, TextInputFormatter, rootBundle;
 
 import '../../widgets/custom_text_field.dart';
 
@@ -34,32 +37,36 @@ class PostulationDetailsPsychology extends StatefulWidget {
 }
 
 class _PostulationDetails extends State<PostulationDetailsPsychology> {
-
   TextEditingController hermanosUEEController = TextEditingController();
   TextEditingController nombreHermanoController = TextEditingController();
   TextEditingController nombreEscuelaController = TextEditingController();
   TextEditingController obsController = TextEditingController();
   TextEditingController fechaEntrevistaController = TextEditingController();
   TextEditingController psicologoEncargadoController = TextEditingController();
-  TextEditingController informeBreveEntrevistaController = TextEditingController();
-  TextEditingController recomendacionPsicologiaController = TextEditingController();
+  TextEditingController informeBreveEntrevistaController =
+      TextEditingController();
+  TextEditingController recomendacionPsicologiaController =
+      TextEditingController();
   TextEditingController respuestaPPFFController = TextEditingController();
-  TextEditingController fechaEntrevistaCoordinacionController = TextEditingController();
-  TextEditingController vistoBuenoCoordinacionController = TextEditingController();
+  TextEditingController fechaEntrevistaCoordinacionController =
+      TextEditingController();
+  TextEditingController vistoBuenoCoordinacionController =
+      TextEditingController();
   TextEditingController respuestaAPpffController = TextEditingController();
   TextEditingController administracionController = TextEditingController();
   TextEditingController recepcionDocumentosController = TextEditingController();
-  TextEditingController estadoEntrevistaPsicologiaController = TextEditingController();
+  TextEditingController estadoEntrevistaPsicologiaController =
+      TextEditingController();
   TextEditingController estadoGeneralController = TextEditingController();
   TextEditingController estadoConfirmacionController = TextEditingController();
 
   //controladores nuevos campos arriba
   AccessRemoteDataSourceImpl accessDataSource = AccessRemoteDataSourceImpl();
   PostulationRemoteDatasourceImpl postulationRemoteDatasourceImpl =
-  PostulationRemoteDatasourceImpl();
+      PostulationRemoteDatasourceImpl();
   PersonaDataSource _personaDataSource = PersonaDataSourceImpl();
   final NotificationRemoteDataSource notificationRemoteDataSource =
-  NotificationRemoteDataSourceImpl();
+      NotificationRemoteDataSourceImpl();
   late PostulationModel postulation;
   bool isLoading = true;
   String fatherUserName = '';
@@ -69,7 +76,8 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
   DateTime? _newInterviewDateTime;
   DateTime? _proposeCoordinationDateTime;
   Future<void> sendEmail(String toEmail, String subject, String message) async {
-    final url = Uri.parse('http://localhost:3000/send-email'); // URL del servidor Node.js
+    final url = Uri.parse(
+        'http://localhost:3000/send-email'); // URL del servidor Node.js
 
     final response = await http.post(
       url,
@@ -93,35 +101,36 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
     postulationRemoteDatasourceImpl
         .getPostulationByID(widget.id)
         .then((value) => {
-      isLoading = true,
-      postulation = value,
-      if (mounted)
-        {
-          setState(() {
-            _markers.add(
-              Marker(
-                markerId: MarkerId(postulation.toString()+postulation.longitude.toString()),
-                position: LatLng(postulation.latitude, postulation.longitude),
-                // infoWindow: InfoWindow(
-                //   title: 'New Marker',
-                //   snippet: 'Lat: ${widget.personModel.latitude}, Lng: ${widget.personModel.longitude}',
-                // ),
-              ),
-            );
-            isLoading = false;
-          })
-        }
-    });
-
+              isLoading = true,
+              postulation = value,
+              if (mounted)
+                {
+                  setState(() {
+                    _markers.add(
+                      Marker(
+                        markerId: MarkerId(postulation.toString() +
+                            postulation.longitude.toString()),
+                        position:
+                            LatLng(postulation.latitude, postulation.longitude),
+                        // infoWindow: InfoWindow(
+                        //   title: 'New Marker',
+                        //   snippet: 'Lat: ${widget.personModel.latitude}, Lng: ${widget.personModel.longitude}',
+                        // ),
+                      ),
+                    );
+                    isLoading = false;
+                  })
+                }
+            });
 
     super.initState();
   }
-
 
   @override
   void dispose() {
     super.dispose();
   }
+
   final controllerLatitud = TextEditingController();
   final controllerLongitud = TextEditingController();
   //MARKERW BEGIN
@@ -160,18 +169,18 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
 
   final Set<Marker> _markers = {};
   //ssssssss
-  double _markerInfoLati =0;
-  double _markerInfoLong =0;
+  double _markerInfoLati = 0;
+  double _markerInfoLong = 0;
 
-  double _markLATI =0;
-  double _markLONG =0;
+  double _markLATI = 0;
+  double _markLONG = 0;
   void _onMapTapped(LatLng position) {
     setState(() {
       // Limpia el conjunto de marcadores antes de agregar uno nuevo
       _markers.clear();
       _markers.add(Marker(
         markerId:
-        MarkerId(position.toString()), // Usar la posición como ID único
+            MarkerId(position.toString()), // Usar la posición como ID único
         position: position,
         infoWindow: InfoWindow(
           title: 'New Marker',
@@ -180,21 +189,18 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
       ));
       setState(() {
         _markerInfoLati = position.latitude;
-        print('Latitude: $_markerInfoLati' );
-        _markLATI=_markerInfoLati;
+        print('Latitude: $_markerInfoLati');
+        _markLATI = _markerInfoLati;
         _markerInfoLong = position.longitude;
-        print('Latitude: $_markerInfoLong' );
-        _markLONG=_markerInfoLong;
-
+        print('Latitude: $_markerInfoLong');
+        _markLONG = _markerInfoLong;
       });
-
     });
 
     cambiar();
     //_writeToDirectionField();
   }
   // Campo de clase para almacenar la información del marcador
-
 
   String mostrarMarcador() {
     String latu = '';
@@ -210,17 +216,14 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
     ;
     return eje;
   }
-  void cambiar(){
-    controllerLatitud.text= _markerInfoLati.toString();
-    controllerLongitud.text= _markerInfoLong.toString();
+
+  void cambiar() {
+    controllerLatitud.text = _markerInfoLati.toString();
+    controllerLongitud.text = _markerInfoLong.toString();
   }
 
   String _varlo = "";
   //METODO CARGAR
-
-
-
-
 
   //METODO MAPAGOOGLE-FIN
 
@@ -269,52 +272,183 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
     );
   }
 
-  //PDF
-  Future<void> generatePdf(BuildContext context, PostulationModel postulation) async {
+// PDF Generation
+  Future<void> generatePdf(
+      BuildContext context, PostulationModel postulation) async {
     final pdf = pw.Document();
-    // Cargar la imagen de los assets
+
+    // Cargar la imagen del logo
     final ByteData bytes = await rootBundle.load('assets/ui/logo.png');
     final Uint8List imageData = bytes.buffer.asUint8List();
     final image = pw.MemoryImage(imageData);
 
+    // Estilos personalizados
+    final headerStyle = pw.TextStyle(
+      fontSize: 24,
+      fontWeight: pw.FontWeight.bold,
+      color: PdfColors.blue900,
+    );
+
+    final titleStyle = pw.TextStyle(
+      fontSize: 18,
+      fontWeight: pw.FontWeight.bold,
+      color: PdfColors.blue800,
+    );
+
+    final subtitleStyle = pw.TextStyle(
+      fontSize: 14,
+      fontWeight: pw.FontWeight.bold,
+      color: PdfColors.blue700,
+    );
+
+    final normalStyle = pw.TextStyle(
+      fontSize: 12,
+      color: PdfColors.black,
+    );
+
     pdf.addPage(
       pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: pw.EdgeInsets.all(32),
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
+              // Encabezado con logo
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
-                  pw.Container(), // Contenedor vacÃ­o para empujar la imagen a la derecha
-                  pw.Image(image, width: 100, height: 100), // Imagen en la parte superior derecha
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text('COLEGIO IRLANDES', style: headerStyle),
+                    ],
+                  ),
+                  pw.Container(
+                    height: 80,
+                    width: 80,
+                    child: pw.Image(image, fit: pw.BoxFit.contain),
+                  ),
                 ],
               ),
-              pw.SizedBox(height: 20), // Espacio entre la imagen y el texto
+
+              pw.Divider(color: PdfColors.green, thickness: 2),
+              pw.SizedBox(height: 20),
+
+              // Título principal
               pw.Center(
+                child: pw.Text(
+                  'DETALLES DE POSTULACIÓN',
+                  style: titleStyle.copyWith(
+                    decoration: pw.TextDecoration.underline,
+                  ),
+                ),
+              ),
+              pw.SizedBox(height: 30),
+
+              // Información del estudiante
+              pw.Container(
+                decoration: pw.BoxDecoration(
+                  color: PdfColors.green50,
+                  borderRadius: pw.BorderRadius.circular(5),
+                ),
+                padding: pw.EdgeInsets.all(15),
                 child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text('Detalles de postulaciÃ³n', style: pw.TextStyle(fontSize: 20)),
-                    pw.Text('Fecha de entrevista: ${DateFormat('dd/MM/yyyy').format(postulation.interview_date)} ${postulation.interview_hour}', style: pw.TextStyle(fontSize: 14)),
-                    pw.Text('Nombre completo postulanre: ${postulation.student_name} ${postulation.student_lastname}', style: pw.TextStyle(fontSize: 14)),
+                    pw.Text('INFORMACIÓN DEL ESTUDIANTE', style: subtitleStyle),
+                    pw.SizedBox(height: 10),
                     pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.center,
                       children: [
-                        pw.Text('Nivel: ${postulation.level}', style: pw.TextStyle(fontSize: 14)),
-                        pw.SizedBox(width: 35),
-                        pw.Text('Grado: ${postulation.grade}', style: pw.TextStyle(fontSize: 14)),
+                        pw.Text('Nombre completo: ',
+                            style: normalStyle.copyWith(
+                                fontWeight: pw.FontWeight.bold)),
+                        pw.Text(
+                            '${postulation.student_name} ${postulation.student_lastname}',
+                            style: normalStyle),
                       ],
                     ),
+                    pw.SizedBox(height: 5),
                     pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.center,
                       children: [
-                        pw.Text('Unidad educativa de procedencia: ${postulation.institutional_unit}', style: pw.TextStyle(fontSize: 14)),
-                        pw.SizedBox(width: 35),
-                        pw.Text('Ciudad: ${postulation.city}', style: pw.TextStyle(fontSize: 14)),
+                        pw.Text('Fecha de entrevista: ',
+                            style: normalStyle.copyWith(
+                                fontWeight: pw.FontWeight.bold)),
+                        pw.Text(
+                            '${DateFormat('dd/MM/yyyy').format(postulation.interview_date)} ${postulation.interview_hour}',
+                            style: normalStyle),
                       ],
                     ),
                   ],
+                ),
+              ),
+              pw.SizedBox(height: 20),
+
+              // Detalles académicos
+              pw.Container(
+                decoration: pw.BoxDecoration(
+                  color: PdfColors.green50,
+                  borderRadius: pw.BorderRadius.circular(5),
+                ),
+                padding: pw.EdgeInsets.all(15),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text('DETALLES ACADÉMICOS', style: subtitleStyle),
+                    pw.SizedBox(height: 10),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text('Nivel:',
+                                style: normalStyle.copyWith(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.Text(postulation.level, style: normalStyle),
+                          ],
+                        ),
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text('Grado:',
+                                style: normalStyle.copyWith(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.Text(postulation.grade, style: normalStyle),
+                          ],
+                        ),
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text('Unidad educativa:',
+                                style: normalStyle.copyWith(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.Text(postulation.institutional_unit,
+                                style: normalStyle),
+                          ],
+                        ),
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text('Ciudad:',
+                                style: normalStyle.copyWith(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.Text(postulation.city, style: normalStyle),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Pie de página
+              pw.SizedBox(height: 40),
+              pw.Divider(color: PdfColors.green, thickness: 1),
+              pw.Center(
+                child: pw.Text(
+                  'Generado el ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',
+                  style: normalStyle.copyWith(fontStyle: pw.FontStyle.italic),
                 ),
               ),
             ],
@@ -323,23 +457,33 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
       ),
     );
 
-    // Guardar el PDF como blob en memoria
+    // Generar el blob en verde
     final Uint8List pdfBytes = await pdf.save();
-    final blob = html.Blob([pdfBytes]);
+    final blob = html.Blob([pdfBytes], 'application/pdf');
 
-    // Crear un URL del blob y abrir una ventana para descargar el archivo
+    // Crear y descargar el PDF
     final url = html.Url.createObjectUrlFromBlob(blob);
     final anchor = html.AnchorElement(href: url)
-      ..setAttribute("download", "postulation_details_${postulation.student_name} ${postulation.student_lastname}.pdf")
+      ..setAttribute("download",
+          "Postulacion_${postulation.student_name}_${postulation.student_lastname}.pdf")
+      ..style.color = 'green' // Color verde para el blob
+      ..style.fontWeight = 'bold'
       ..click();
 
-    // Limpiar la URL creada
+    // Limpiar la URL
     html.Url.revokeObjectUrl(url);
 
-    // Mostrar un mensaje de Ã©xito
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('PDF generado exitosamente'),
-    ));
+    // Mostrar mensaje de éxito
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('PDF generado exitosamente'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
   }
 
   final List<String> nombresHermanos = [];
@@ -352,6 +496,7 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
       });
     }
   }
+
   final List<String> nombresEscuela = [];
 
   void _addScholl(String escuela) {
@@ -362,7 +507,6 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -393,824 +537,863 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Center(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Container(
-              width: constraints.maxWidth * 0.6,
-              constraints: const BoxConstraints(
-                minWidth: 700.0,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE3E9F4),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(50),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Fecha de entrevista:',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            color: Color(0xFF044086), fontSize: 18),
-                      ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return Container(
+                    width: constraints.maxWidth * 0.6,
+                    constraints: const BoxConstraints(
+                      minWidth: 700.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE3E9F4),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(50),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Fecha de entrevista:',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  color: Color(0xFF044086), fontSize: 18),
+                            ),
 
+                            InkWell(
+                              onTap: () async {
+                                try {
+                                  // Definir una fecha inicial que sea un punto de referencia en el pasado
+                                  DateTime firstAllowedDate = DateTime(2000);
 
-                      InkWell(
-                        onTap: () async {
-                          try {
-                            // Definir una fecha inicial que sea un punto de referencia en el pasado
-                            DateTime firstAllowedDate = DateTime(2000);
-
-                            final selectedDate = await showDatePicker(
-                              context: context,
-                              initialDate: postulation.interview_date.isBefore(firstAllowedDate)
-                                  ? DateTime.now()
-                                  : postulation.interview_date,
-                              firstDate: firstAllowedDate,
-                              lastDate: DateTime(2100),
-                            );
-
-                            if (selectedDate != null) {
-                              final selectedTime = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.fromDateTime(postulation.interview_date),
-                              );
-
-                              if (selectedTime != null) {
-                                setState(() {
-                                  _newInterviewDateTime = DateTime(
-                                    selectedDate.year,
-                                    selectedDate.month,
-                                    selectedDate.day,
-                                    selectedTime.hour,
-                                    selectedTime.minute,
+                                  final selectedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: postulation.interview_date
+                                            .isBefore(firstAllowedDate)
+                                        ? DateTime.now()
+                                        : postulation.interview_date,
+                                    firstDate: firstAllowedDate,
+                                    lastDate: DateTime(2100),
                                   );
-                                });
-                              }
-                            }
-                          } catch (e) {
-                            print('Error selecting date/time: $e');
-                            // Optionally, show a dialog to inform the user about the error
-                          }
-                        },
-                        child: _newInterviewDateTime != null
-                            ? Text('${_newInterviewDateTime.toString()}')
-                            : const Text('Seleccionar nueva fecha y hora'),
-                      ),
-                      Text(
-                        ('${DateFormat('dd/MM/yyyy').format(postulation.interview_date)} ${postulation.interview_hour}'),
-                        style: const TextStyle(
-                            color: Colors.black, fontSize: 18),
-                      ),
-                      ElevatedButton(
-                        onPressed: _newInterviewDateTime != null
-                            ? () async {
-                          try {
-                            // Actualizar la fecha y hora de la entrevista en Firebase
-                            await postulationRemoteDatasourceImpl.updateInterviewDateTime(
-                              widget.id,
-                              _newInterviewDateTime!,
-                              TimeOfDay.fromDateTime(_newInterviewDateTime!).format(context),
-                            );
 
-                            // Actualizar el estado del widget con la nueva fecha y hora
-                            setState(() {
-                              postulation.interview_date = _newInterviewDateTime!;
-                              postulation.interview_hour = TimeOfDay.fromDateTime(_newInterviewDateTime!).format(context);
-                              _newInterviewDateTime = null;
-                            });
-                            Fluttertoast.showToast(
-                              msg: 'La fecha de la entrevista se ha actualizado correctamente',
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.green,
-                              textColor: Colors.white,
-                              fontSize: 16.0,
-                            );
-                          } catch (e) {
-                            print('Error updating interview date/time: $e');
-                            // Optionally, show a dialog to inform the user about the error
-                          }
-                        }
-                            : null,
-                        child: const Text('Guardar cambios'),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'Nivel:',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                color: Color(0xFF044086), fontSize: 18),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            postulation.level,
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                                color: Colors.black, fontSize: 18),
-                          ),
-                          const SizedBox(
-                            width: 35,
-                          ),
-                          const Text(
-                            'Grado:',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                color: Color(0xFF044086), fontSize: 18),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            postulation.grade,
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                                color: Colors.black, fontSize: 18),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'Unidad educativa de procedencia: ',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                color: Color(0xFF044086), fontSize: 18),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            postulation.institutional_unit,
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                                color: Colors.black, fontSize: 18),
-                          ),
-                          const SizedBox(
-                            width: 35,
-                          ),
-                          const Text(
-                            'Ciudad: ',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                color: Color(0xFF044086), fontSize: 18),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            postulation.city,
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                                color: Colors.black, fontSize: 18),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Postulante',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Color(0xFF044086),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Row(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(
-                                      width: 35,
-                                    ),
-                                    const Text(
-                                      'Nombre: ',
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          color: Color(0xFF044086),
-                                          fontSize: 18),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      '${postulation.student_name} ${postulation.student_lastname}',
-                                      textAlign: TextAlign.left,
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                Row(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(
-                                      width: 35,
-                                    ),
-                                    const Text(
-                                      'CI: ',
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          color: Color(0xFF044086),
-                                          fontSize: 18),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      postulation.student_ci,
-                                      textAlign: TextAlign.left,
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18),
-                                    ),
-                                    const SizedBox(
-                                      width: 35,
-                                    ),
-                                    const Text(
-                                      'Género: ',
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          color: Color(0xFF044086),
-                                          fontSize: 18),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      postulation.gender,
-                                      textAlign: TextAlign.left,
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18),
-                                    ),
-                                    const SizedBox(
-                                      width: 35,
-                                    ),
-                                    const Text(
-                                      'Fecha de nacimiento: ',
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          color: Color(0xFF044086),
-                                          fontSize: 18),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      DateFormat('dd/MM/yyyy')
-                                          .format(postulation.birth_day),
-                                      textAlign: TextAlign.left,
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            )),
-                      ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      if (postulation.father_name.trim() != '')
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Padre',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                color: Color(0xFF044086),
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      if (postulation.father_name.trim() != '')
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                const SizedBox(
-                                  width: 35,
-                                ),
-                                const Text(
-                                  'Nombre: ',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      color: Color(0xFF044086),
-                                      fontSize: 18),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  '${postulation.father_name} ${postulation.father_lastname}',
-                                  textAlign: TextAlign.left,
-                                  style: const TextStyle(
-                                      color: Colors.black, fontSize: 18),
-                                ),
-                                const SizedBox(
-                                  width: 35,
-                                ),
-                                const Text(
-                                  'Número de celular : ',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      color: Color(0xFF044086),
-                                      fontSize: 18),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  postulation.father_cellphone,
-                                  textAlign: TextAlign.left,
-                                  style: const TextStyle(
-                                      color: Colors.black, fontSize: 18),
-                                ),
-                              ],
+                                  if (selectedDate != null) {
+                                    final selectedTime = await showTimePicker(
+                                      context: context,
+                                      initialTime: TimeOfDay.fromDateTime(
+                                          postulation.interview_date),
+                                    );
+
+                                    if (selectedTime != null) {
+                                      setState(() {
+                                        _newInterviewDateTime = DateTime(
+                                          selectedDate.year,
+                                          selectedDate.month,
+                                          selectedDate.day,
+                                          selectedTime.hour,
+                                          selectedTime.minute,
+                                        );
+                                      });
+                                    }
+                                  }
+                                } catch (e) {
+                                  print('Error selecting date/time: $e');
+                                  // Optionally, show a dialog to inform the user about the error
+                                }
+                              },
+                              child: _newInterviewDateTime != null
+                                  ? Text('${_newInterviewDateTime.toString()}')
+                                  : const Text(
+                                      'Seleccionar nueva fecha y hora'),
                             ),
-                          ),
-                        ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      if (postulation.mother_name.trim() != '')
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Madre',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                                color: Color(0xFF044086),
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      if (postulation.mother_name.trim() != '')
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                const SizedBox(
-                                  width: 35,
-                                ),
-                                const Text(
-                                  'Nombre: ',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      color: Color(0xFF044086),
-                                      fontSize: 18),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  '${postulation.mother_name} ${postulation.mother_lastname}',
-                                  textAlign: TextAlign.left,
-                                  style: const TextStyle(
-                                      color: Colors.black, fontSize: 18),
-                                ),
-                                const SizedBox(
-                                  width: 35,
-                                ),
-                                const Text(
-                                  'Número de celular: ',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      color: Color(0xFF044086),
-                                      fontSize: 18),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  postulation.mother_cellphone,
-                                  textAlign: TextAlign.left,
-                                  style: const TextStyle(
-                                      color: Colors.black, fontSize: 18),
-                                ),
-                              ],
+                            Text(
+                              ('${DateFormat('dd/MM/yyyy').format(postulation.interview_date)} ${postulation.interview_hour}'),
+                              style: const TextStyle(
+                                  color: Colors.black, fontSize: 18),
                             ),
-                          ),
-                        ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Datos de contacto',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Color(0xFF044086),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              const SizedBox(
-                                width: 35,
-                              ),
-                              const Text(
-                                'Teléfono: ',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    color: Color(0xFF044086),
-                                    fontSize: 18),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                postulation.telephone,
-                                textAlign: TextAlign.left,
-                                style: const TextStyle(
-                                    color: Colors.black, fontSize: 18),
-                              ),
-                              const SizedBox(
-                                width: 35,
-                              ),
-                              const Text(
-                                'Correo electrónico: ',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    color: Color(0xFF044086),
-                                    fontSize: 18),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                postulation.email,
-                                textAlign: TextAlign.left,
-                                style: const TextStyle(
-                                    color: Colors.black, fontSize: 18),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Direccion del postulante',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Color(0xFF044086),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            ElevatedButton(
+                              onPressed: _newInterviewDateTime != null
+                                  ? () async {
+                                      try {
+                                        // Actualizar la fecha y hora de la entrevista en Firebase
+                                        await postulationRemoteDatasourceImpl
+                                            .updateInterviewDateTime(
+                                          widget.id,
+                                          _newInterviewDateTime!,
+                                          TimeOfDay.fromDateTime(
+                                                  _newInterviewDateTime!)
+                                              .format(context),
+                                        );
+
+                                        // Actualizar el estado del widget con la nueva fecha y hora
+                                        setState(() {
+                                          postulation.interview_date =
+                                              _newInterviewDateTime!;
+                                          postulation.interview_hour =
+                                              TimeOfDay.fromDateTime(
+                                                      _newInterviewDateTime!)
+                                                  .format(context);
+                                          _newInterviewDateTime = null;
+                                        });
+                                        Fluttertoast.showToast(
+                                          msg:
+                                              'La fecha de la entrevista se ha actualizado correctamente',
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 1,
+                                          backgroundColor: Colors.green,
+                                          textColor: Colors.white,
+                                          fontSize: 16.0,
+                                        );
+                                      } catch (e) {
+                                        print(
+                                            'Error updating interview date/time: $e');
+                                        // Optionally, show a dialog to inform the user about the error
+                                      }
+                                    }
+                                  : null,
+                              child: const Text('Guardar cambios'),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SizedBox(
-                                  width:  600 ,
-                                  height:  600 ,
-                                  child: Container(
-                                    color: Colors.blue,
-                                    child: GoogleMap(
-                                      initialCameraPosition: CameraPosition(
-                                        target: _initialPosition,
-                                        zoom: 12,
-                                      ),
-                                      //onTap: _onMapTapped,
-                                      markers: _markers,
-                                      mapType: MapType.none,
-                                      onMapCreated: _onMapCreated,
-                                      onCameraMove: _onCameraMove,
-                                      minMaxZoomPreference: MinMaxZoomPreference(12, 18),
-
-                                    ),
-                                  ),
-                                ),
-                              ]
-                          )
-                      ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-
-                      //psico
-
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Psicologia',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Color(0xFF044086),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              children: [
-
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                TextField(
-                                  controller: nombreEscuelaController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Unidad Educativa de procedencia del hermano ',
-                                    suffixIcon: IconButton(
-                                      icon: Icon(Icons.add),
-                                      onPressed: () => _addScholl(nombreEscuelaController.text),
-                                    ),
-                                  ),
-                                  onSubmitted: _addScholl,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                    FilteringTextInputFormatter.deny(RegExp(r'\s\s+')),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                // Mostrar burbujas con los nombres ingresados
-                                Wrap(
-                                  spacing: 8.0,
-                                  runSpacing: 4.0,
-                                  children: nombresEscuela
-                                      .map((escuela) => _buildSchoolBubble(escuela))
-                                      .toList(),
-                                ),
-                                const SizedBox(height: 10),
-                                // Campo de texto para el nombre del hermano
-                                TextField(
-                                  controller: nombreHermanoController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Nombre completo del hermano',
-                                    suffixIcon: IconButton(
-                                      icon: Icon(Icons.add),
-                                      onPressed: () => _addNombre(nombreHermanoController.text),
-                                    ),
-                                  ),
-                                  onSubmitted: _addNombre,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                    FilteringTextInputFormatter.deny(RegExp(r'\s\s+')),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                // Mostrar burbujas con los nombres ingresados
-                                Wrap(
-                                  spacing: 8.0,
-                                  runSpacing: 4.0,
-                                  children: nombresHermanos
-                                      .map((nombre) => _buildNameBubble(nombre))
-                                      .toList(),
-                                ),
-                                const SizedBox(height: 10),
-
-                                CustomTextField(
-                                  label: 'Observaciones',
-                                  controller: obsController,
-                                  maxLength: 40,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(
-                                            r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(r'\s\s+')),
-                                  ],
-                                ),
-                                CustomTextField(
-                                  label: 'Psicologo Encargado',
-                                  controller: psicologoEncargadoController,
-                                  maxLength: 40,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(
-                                            r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(r'\s\s+')),
-                                  ],
-                                ),
-                                CustomTextField(
-                                  label: 'Informe de Entrevista',
-                                  controller: informeBreveEntrevistaController,
-                                  maxLength: 40,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(
-                                            r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(r'\s\s+')),
-                                  ],
-                                ),
-                                CustomTextField(
-                                  label: 'Recomendacion Psicologia',
-                                  controller: recomendacionPsicologiaController,
-                                  maxLength: 40,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(
-                                            r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(r'\s\s+')),
-                                  ],
-                                ),
-                                CustomTextField(
-                                  label: 'Respuesta PPFF',
-                                  controller: respuestaPPFFController,
-                                  maxLength: 40,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(
-                                            r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(r'\s\s+')),
-                                  ],
-                                ),
-
-
-
                                 const Text(
-                                  'Fecha tentativa para Coordinacion:',
+                                  'Nivel:',
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                       color: Color(0xFF044086), fontSize: 18),
                                 ),
-
-
-                                InkWell(
-                                  onTap: () async {
-                                    try {
-                                      // Definir una fecha inicial que sea un punto de referencia en el pasado
-                                      DateTime firstAllowedDate = DateTime(2000);
-
-                                      final selectedDate = await showDatePicker(
-                                        context: context,
-                                        initialDate: postulation.interview_date.isBefore(firstAllowedDate)
-                                            ? DateTime.now()
-                                            : postulation.interview_date,
-                                        firstDate: firstAllowedDate,
-                                        lastDate: DateTime(2100),
-                                      );
-
-                                      if (selectedDate != null) {
-                                        final selectedTime = await showTimePicker(
-                                          context: context,
-                                          initialTime: TimeOfDay.fromDateTime(postulation.interview_date),
-
-                                        );
-
-                                        if (selectedTime != null) {
-                                          setState(() {
-                                            _proposeCoordinationDateTime = DateTime(
-                                              selectedDate.year,
-                                              selectedDate.month,
-                                              selectedDate.day,
-                                              selectedTime.hour,
-                                              selectedTime.minute,
-                                            );
-                                          });
-                                        }
-                                      }
-                                    } catch (e) {
-                                      print('Error selecting date/time: $e');
-                                      // Optionally, show a dialog to inform the user about the error
-                                    }
-                                  },
-
-                                  child: _proposeCoordinationDateTime != null
-                                      ? Text('${_proposeCoordinationDateTime.toString()}')
-                                      : const Text('Proponer fecha y hora para coordinacion'),
-
-
+                                const SizedBox(
+                                  width: 10,
                                 ),
                                 Text(
-                                  ('${DateFormat('dd/MM/yyyy').format(postulation.fechaEntrevistaCoordinacion)} ${postulation.fechaEntrevistaCoordinacion.hour}:${postulation.fechaEntrevistaCoordinacion.minute}'),
+                                  postulation.level,
+                                  textAlign: TextAlign.left,
                                   style: const TextStyle(
                                       color: Colors.black, fontSize: 18),
                                 ),
-                                ElevatedButton(
-                                  onPressed: _proposeCoordinationDateTime != null
-                                      ? () async {
-                                    try {
-                                      // Actualizar la fecha y hora de la entrevista en Firebase
-                                      /*
+                                const SizedBox(
+                                  width: 35,
+                                ),
+                                const Text(
+                                  'Grado:',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      color: Color(0xFF044086), fontSize: 18),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  postulation.grade,
+                                  textAlign: TextAlign.left,
+                                  style: const TextStyle(
+                                      color: Colors.black, fontSize: 18),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'Unidad educativa de procedencia: ',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      color: Color(0xFF044086), fontSize: 18),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  postulation.institutional_unit,
+                                  textAlign: TextAlign.left,
+                                  style: const TextStyle(
+                                      color: Colors.black, fontSize: 18),
+                                ),
+                                const SizedBox(
+                                  width: 35,
+                                ),
+                                const Text(
+                                  'Ciudad: ',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      color: Color(0xFF044086), fontSize: 18),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  postulation.city,
+                                  textAlign: TextAlign.left,
+                                  style: const TextStyle(
+                                      color: Colors.black, fontSize: 18),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Postulante',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: Color(0xFF044086),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(
+                                            width: 35,
+                                          ),
+                                          const Text(
+                                            'Nombre: ',
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                                color: Color(0xFF044086),
+                                                fontSize: 18),
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            '${postulation.student_name} ${postulation.student_lastname}',
+                                            textAlign: TextAlign.left,
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(
+                                            width: 35,
+                                          ),
+                                          const Text(
+                                            'CI: ',
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                                color: Color(0xFF044086),
+                                                fontSize: 18),
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            postulation.student_ci,
+                                            textAlign: TextAlign.left,
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18),
+                                          ),
+                                          const SizedBox(
+                                            width: 35,
+                                          ),
+                                          const Text(
+                                            'Género: ',
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                                color: Color(0xFF044086),
+                                                fontSize: 18),
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            postulation.gender,
+                                            textAlign: TextAlign.left,
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18),
+                                          ),
+                                          const SizedBox(
+                                            width: 35,
+                                          ),
+                                          const Text(
+                                            'Fecha de nacimiento: ',
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                                color: Color(0xFF044086),
+                                                fontSize: 18),
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            DateFormat('dd/MM/yyyy')
+                                                .format(postulation.birth_day),
+                                            textAlign: TextAlign.left,
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  )),
+                            ),
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            if (postulation.father_name.trim() != '')
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Padre',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      color: Color(0xFF044086),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            if (postulation.father_name.trim() != '')
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(
+                                        width: 35,
+                                      ),
+                                      const Text(
+                                        'Nombre: ',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            color: Color(0xFF044086),
+                                            fontSize: 18),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        '${postulation.father_name} ${postulation.father_lastname}',
+                                        textAlign: TextAlign.left,
+                                        style: const TextStyle(
+                                            color: Colors.black, fontSize: 18),
+                                      ),
+                                      const SizedBox(
+                                        width: 35,
+                                      ),
+                                      const Text(
+                                        'Número de celular : ',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            color: Color(0xFF044086),
+                                            fontSize: 18),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        postulation.father_cellphone,
+                                        textAlign: TextAlign.left,
+                                        style: const TextStyle(
+                                            color: Colors.black, fontSize: 18),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            if (postulation.mother_name.trim() != '')
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Madre',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      color: Color(0xFF044086),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            if (postulation.mother_name.trim() != '')
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(
+                                        width: 35,
+                                      ),
+                                      const Text(
+                                        'Nombre: ',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            color: Color(0xFF044086),
+                                            fontSize: 18),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        '${postulation.mother_name} ${postulation.mother_lastname}',
+                                        textAlign: TextAlign.left,
+                                        style: const TextStyle(
+                                            color: Colors.black, fontSize: 18),
+                                      ),
+                                      const SizedBox(
+                                        width: 35,
+                                      ),
+                                      const Text(
+                                        'Número de celular: ',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            color: Color(0xFF044086),
+                                            fontSize: 18),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        postulation.mother_cellphone,
+                                        textAlign: TextAlign.left,
+                                        style: const TextStyle(
+                                            color: Colors.black, fontSize: 18),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Datos de contacto',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: Color(0xFF044086),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(
+                                      width: 35,
+                                    ),
+                                    const Text(
+                                      'Teléfono: ',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          color: Color(0xFF044086),
+                                          fontSize: 18),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      postulation.telephone,
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                          color: Colors.black, fontSize: 18),
+                                    ),
+                                    const SizedBox(
+                                      width: 35,
+                                    ),
+                                    const Text(
+                                      'Correo electrónico: ',
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          color: Color(0xFF044086),
+                                          fontSize: 18),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      postulation.email,
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                          color: Colors.black, fontSize: 18),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Direccion del postulante',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: Color(0xFF044086),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width: 600,
+                                        height: 600,
+                                        child: Container(
+                                          color: Colors.blue,
+                                          child: GoogleMap(
+                                            initialCameraPosition:
+                                                CameraPosition(
+                                              target: _initialPosition,
+                                              zoom: 12,
+                                            ),
+                                            //onTap: _onMapTapped,
+                                            markers: _markers,
+                                            mapType: MapType.none,
+                                            onMapCreated: _onMapCreated,
+                                            onCameraMove: _onCameraMove,
+                                            minMaxZoomPreference:
+                                                MinMaxZoomPreference(12, 18),
+                                          ),
+                                        ),
+                                      ),
+                                    ])),
+                            const SizedBox(
+                              height: 25,
+                            ),
+
+                            //psico
+
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Psicologia',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: Color(0xFF044086),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      TextField(
+                                        controller: nombreEscuelaController,
+                                        decoration: InputDecoration(
+                                          labelText:
+                                              'Unidad Educativa de procedencia del hermano ',
+                                          suffixIcon: IconButton(
+                                            icon: Icon(Icons.add),
+                                            onPressed: () => _addScholl(
+                                                nombreEscuelaController.text),
+                                          ),
+                                        ),
+                                        onSubmitted: _addScholl,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(
+                                                  r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\s\s+')),
+                                        ],
+                                      ),
+                                      SizedBox(height: 10),
+                                      // Mostrar burbujas con los nombres ingresados
+                                      Wrap(
+                                        spacing: 8.0,
+                                        runSpacing: 4.0,
+                                        children: nombresEscuela
+                                            .map((escuela) =>
+                                                _buildSchoolBubble(escuela))
+                                            .toList(),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      // Campo de texto para el nombre del hermano
+                                      TextField(
+                                        controller: nombreHermanoController,
+                                        decoration: InputDecoration(
+                                          labelText:
+                                              'Nombre completo del hermano',
+                                          suffixIcon: IconButton(
+                                            icon: Icon(Icons.add),
+                                            onPressed: () => _addNombre(
+                                                nombreHermanoController.text),
+                                          ),
+                                        ),
+                                        onSubmitted: _addNombre,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(
+                                                  r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\s\s+')),
+                                        ],
+                                      ),
+                                      SizedBox(height: 10),
+                                      // Mostrar burbujas con los nombres ingresados
+                                      Wrap(
+                                        spacing: 8.0,
+                                        runSpacing: 4.0,
+                                        children: nombresHermanos
+                                            .map((nombre) =>
+                                                _buildNameBubble(nombre))
+                                            .toList(),
+                                      ),
+                                      const SizedBox(height: 10),
+
+                                      CustomTextField(
+                                        label: 'Observaciones',
+                                        controller: obsController,
+                                        maxLength: 40,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(
+                                                  r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\s\s+')),
+                                        ],
+                                      ),
+                                      CustomTextField(
+                                        label: 'Psicologo Encargado',
+                                        controller:
+                                            psicologoEncargadoController,
+                                        maxLength: 40,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(
+                                                  r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\s\s+')),
+                                        ],
+                                      ),
+                                      CustomTextField(
+                                        label: 'Informe de Entrevista',
+                                        controller:
+                                            informeBreveEntrevistaController,
+                                        maxLength: 40,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(
+                                                  r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\s\s+')),
+                                        ],
+                                      ),
+                                      CustomTextField(
+                                        label: 'Recomendacion Psicologia',
+                                        controller:
+                                            recomendacionPsicologiaController,
+                                        maxLength: 40,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(
+                                                  r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\s\s+')),
+                                        ],
+                                      ),
+                                      CustomTextField(
+                                        label: 'Respuesta PPFF',
+                                        controller: respuestaPPFFController,
+                                        maxLength: 40,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(
+                                                  r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\s\s+')),
+                                        ],
+                                      ),
+
+                                      const Text(
+                                        'Fecha tentativa para Coordinacion:',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            color: Color(0xFF044086),
+                                            fontSize: 18),
+                                      ),
+
+                                      InkWell(
+                                        onTap: () async {
+                                          try {
+                                            // Definir una fecha inicial que sea un punto de referencia en el pasado
+                                            DateTime firstAllowedDate =
+                                                DateTime(2000);
+
+                                            final selectedDate =
+                                                await showDatePicker(
+                                              context: context,
+                                              initialDate: postulation
+                                                      .interview_date
+                                                      .isBefore(
+                                                          firstAllowedDate)
+                                                  ? DateTime.now()
+                                                  : postulation.interview_date,
+                                              firstDate: firstAllowedDate,
+                                              lastDate: DateTime(2100),
+                                            );
+
+                                            if (selectedDate != null) {
+                                              final selectedTime =
+                                                  await showTimePicker(
+                                                context: context,
+                                                initialTime:
+                                                    TimeOfDay.fromDateTime(
+                                                        postulation
+                                                            .interview_date),
+                                              );
+
+                                              if (selectedTime != null) {
+                                                setState(() {
+                                                  _proposeCoordinationDateTime =
+                                                      DateTime(
+                                                    selectedDate.year,
+                                                    selectedDate.month,
+                                                    selectedDate.day,
+                                                    selectedTime.hour,
+                                                    selectedTime.minute,
+                                                  );
+                                                });
+                                              }
+                                            }
+                                          } catch (e) {
+                                            print(
+                                                'Error selecting date/time: $e');
+                                            // Optionally, show a dialog to inform the user about the error
+                                          }
+                                        },
+                                        child: _proposeCoordinationDateTime !=
+                                                null
+                                            ? Text(
+                                                '${_proposeCoordinationDateTime.toString()}')
+                                            : const Text(
+                                                'Proponer fecha y hora para coordinacion'),
+                                      ),
+                                      Text(
+                                        ('${DateFormat('dd/MM/yyyy').format(postulation.fechaEntrevistaCoordinacion)} ${postulation.fechaEntrevistaCoordinacion.hour}:${postulation.fechaEntrevistaCoordinacion.minute}'),
+                                        style: const TextStyle(
+                                            color: Colors.black, fontSize: 18),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed:
+                                            _proposeCoordinationDateTime != null
+                                                ? () async {
+                                                    try {
+                                                      // Actualizar la fecha y hora de la entrevista en Firebase
+                                                      /*
                                       await postulationRemoteDatasourceImpl.updateInterviewDateTime(
                                         widget.id,
                                         _newInterviewDateTime!,
                                         TimeOfDay.fromDateTime(_newInterviewDateTime!).format(context),
                                       );*/
 
-
-                                      // Actualizar el estado del widget con la nueva fecha y hora
-                                      setState(() {
-                                        postulation.fechaEntrevistaCoordinacion = _proposeCoordinationDateTime!;
-                                        print('Postulación actualizada con nueva fecha: ${recomendacionPsicologiaController.text}');
-                                        //postulation.interview_hour = TimeOfDay.fromDateTime(_newInterviewDateTime!).format(context);
-                                        _proposeCoordinationDateTime = null;
-                                      });
-                                      Fluttertoast.showToast(
-                                        msg: 'La fecha de la entrevista se ha actualizado correctamente',
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        gravity: ToastGravity.BOTTOM,
-                                        timeInSecForIosWeb: 1,
-                                        backgroundColor: Colors.green,
-                                        textColor: Colors.white,
-                                        fontSize: 16.0,
-                                      );
-                                    } catch (e) {
-                                      print('Error updating interview date/time: $e');
-                                      // Optionally, show a dialog to inform the user about the error
-                                    }
-                                  }
-                                      : null,
-                                  child: const Text('Guardar'),
+                                                      // Actualizar el estado del widget con la nueva fecha y hora
+                                                      setState(() {
+                                                        postulation
+                                                                .fechaEntrevistaCoordinacion =
+                                                            _proposeCoordinationDateTime!;
+                                                        print(
+                                                            'Postulación actualizada con nueva fecha: ${recomendacionPsicologiaController.text}');
+                                                        //postulation.interview_hour = TimeOfDay.fromDateTime(_newInterviewDateTime!).format(context);
+                                                        _proposeCoordinationDateTime =
+                                                            null;
+                                                      });
+                                                      Fluttertoast.showToast(
+                                                        msg:
+                                                            'La fecha de la entrevista se ha actualizado correctamente',
+                                                        toastLength:
+                                                            Toast.LENGTH_SHORT,
+                                                        gravity:
+                                                            ToastGravity.BOTTOM,
+                                                        timeInSecForIosWeb: 1,
+                                                        backgroundColor:
+                                                            Colors.green,
+                                                        textColor: Colors.white,
+                                                        fontSize: 16.0,
+                                                      );
+                                                    } catch (e) {
+                                                      print(
+                                                          'Error updating interview date/time: $e');
+                                                      // Optionally, show a dialog to inform the user about the error
+                                                    }
+                                                  }
+                                                : null,
+                                        child: const Text('Guardar'),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 25,
-                          ),
-                          const SizedBox(
-                            width: 25,
-                          ),
-                          /*
+                                const SizedBox(
+                                  width: 25,
+                                ),
+                                const SizedBox(
+                                  width: 25,
+                                ),
+                                /*
                           Expanded(
                             child: CustomTextField(
                               label: 'Apellidos',
@@ -1225,356 +1408,361 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
                               ],
                             ),
                           ) */
-                        ],
-                      ),
-                      //psico
-                      if (postulation.userID == '0')
-                        const Text(
-                          'No se tiene acceso a la aplicación',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Colors.black, fontSize: 18),
-                        ),
-                      if (postulation.userID != '0')
-                        const Text(
-                          'Se tiene acceso a la aplicación',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Colors.black, fontSize: 18),
-                        ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  const Color(0xFF044086)),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                              ),
+                              ],
                             ),
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      alignment: Alignment.center,
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          if (postulation.status ==
-                                              'Pendiente')
-                                            const Text(
-                                                '¿Estás seguro de que quieres confirmar la entevista?',
-                                                textAlign:
-                                                TextAlign.center,
-                                                style: TextStyle(
-                                                    color:
-                                                    Color(0xFF3D5269),
-                                                    fontWeight:
-                                                    FontWeight.bold,
-                                                    fontSize: 18)),
-                                          if (postulation.status ==
-                                              'Confirmado')
-                                            const Text(
-                                                '¿Estás seguro de que quieres Aprobar esta postulación?',
-                                                textAlign:
-                                                TextAlign.center,
-                                                style: TextStyle(
-                                                    color:
-                                                    Color(0xFF3D5269),
-                                                    fontWeight:
-                                                    FontWeight.bold,
-                                                    fontSize: 18)),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                const EdgeInsets.only(
-                                                    left: 5,
-                                                    right: 5),
-                                                child: ElevatedButton(
-                                                    onPressed: () async {
-                                                      try {
-                                                        if (postulation
-                                                            .status ==
-                                                            'Pendiente') {
-                                                          //sss
-                                                          enviarNotificacionConfirmado(
-                                                              postulation);
-
-                                                          await postulationRemoteDatasourceImpl
-                                                              .updatePostulationStatus(
-                                                              widget
-                                                                  .id,
-                                                              'Confirmado');
-
-
-
-                                                          // Enviar el correo electrÃ³nico notificando la actualizaciÃ³n
-                                                          String formattedDate = DateFormat('yyyy-MM-dd').format(postulation.interview_date);
-                                                          String messagetosend = 'Estimado padre/madre/tutor,\n\n'
-                                                              'La fecha de la entrevista se ha confirmado para la fecha $formattedDate a las ${postulation.interview_hour} para el departamento de PsicologÃ­a.\n\n'
-                                                              'Saludos cordiales,\n'
-                                                              'Colegio Esclavas del Sagrado CorazÃ³n de JesÃºs';
-                                                          await sendEmail(
-                                                            postulation.email, // Reemplaza con el correo del destinatario
-                                                            'ConfirmaciÃ³n de entrevista',
-                                                            messagetosend,
-                                                          );
-                                                          // ignore: use_build_context_synchronously
-                                                          Navigator.of(
-                                                              context)
-                                                              .pop();
-                                                          // ignore: use_build_context_synchronously
-                                                          showMessageDialog(
-                                                              context,
-                                                              'assets/ui/marque-el-circulo.png',
-                                                              'Correcto',
-                                                              'Se ha confirmado la entrevista');
-                                                        } else {
-
-                                                          actualizarCamposPostulacion(widget.id);
-                                                          await postulationRemoteDatasourceImpl
-                                                              .updatePostulationStatus(
-                                                              widget
-                                                                  .id,
-                                                              'Aprobado');
-                                                          //crear usuario
-                                                          crearUsuario(
-                                                              postulation);
-                                                          enviarNotificacionAprovado(
-                                                              postulation);
-                                                          // ignore: use_build_context_synchronously
-                                                          Navigator.of(
-                                                              context)
-                                                              .pop();
-                                                          // ignore: use_build_context_synchronously
-                                                          showMessageDialog(
-                                                              context,
-                                                              'assets/ui/marque-el-circulo.png',
-                                                              'Correcto',
-                                                              'Postulación aprobada');
-                                                          if (postulation
-                                                              .userID ==
-                                                              '0') {
-                                                            // ignore: use_build_context_synchronously
-                                                            showMessageDialog(
-                                                                context,
-                                                                'assets/ui/marque-el-circulo.png',
-                                                                'Datos de usuarios',
-                                                                (fatherUserName != ''
-                                                                    ? 'Usuario del padre: $fatherUserName \nContraseña del padre: $fatherPassword\n'
-                                                                    : '') +
-                                                                    (motherUserName != ''
-                                                                        ? 'Usuario de la madre: $motherUserName \nContraseña de la madre: $motherPassword'
-                                                                        : ''));
-                                                          }
-                                                        }
-                                                        setState(() {});
-                                                      } catch (e) {
-                                                        // ignore: use_build_context_synchronously
-                                                        showMessageDialog(
-                                                            context,
-                                                            'assets/ui/circulo-cruzado.png',
-                                                            'Error',
-                                                            'Ha ocurrido un error inesperado');
-                                                      }
-                                                    },
-                                                    style: ButtonStyle(
-                                                        backgroundColor:
-                                                        MaterialStateProperty.all(
-                                                            const Color(
-                                                                0xFF044086))),
-                                                    child: const Text(
-                                                        'Si',
-                                                        style: TextStyle(
-                                                            color: Colors
-                                                                .white))),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                const EdgeInsets.only(
-                                                    left: 5,
-                                                    right: 5),
-                                                child: ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.of(
-                                                          context)
-                                                          .pop();
-                                                    },
-                                                    style: ButtonStyle(
-                                                        backgroundColor:
-                                                        MaterialStateProperty.all(
-                                                            const Color(
-                                                                0xFF044086))),
-                                                    child: const Text(
-                                                        'No',
-                                                        style: TextStyle(
-                                                            color: Colors
-                                                                .white))),
-                                              ),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    );
-                                  });
-                            },
-                            child: postulation.status == 'Pendiente'
-                                ? const Text('Confirmar',
-                                style: TextStyle(color: Colors.white))
-                                : const Text('Aprobar',
-                                style:
-                                TextStyle(color: Colors.white)),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  const Color(0xFFd9534f)),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
+                            //psico
+                            if (postulation.userID == '0')
+                              const Text(
+                                'No se tiene acceso a la aplicación',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 18),
                               ),
+                            if (postulation.userID != '0')
+                              const Text(
+                                'Se tiene acceso a la aplicación',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 18),
+                              ),
+                            const SizedBox(
+                              height: 10,
                             ),
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      alignment: Alignment.center,
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Text(
-                                              '¿Estás seguro de que quieres eliminar la postulación?',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  color:
-                                                  Color(0xFF3D5269),
-                                                  fontWeight:
-                                                  FontWeight.bold,
-                                                  fontSize: 18)),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                const EdgeInsets.only(
-                                                    left: 5,
-                                                    right: 5),
-                                                child: ElevatedButton(
-                                                    onPressed: () async {
-                                                      try {
-                                                        await postulationRemoteDatasourceImpl
-                                                            .deletePostulation(
-                                                            widget
-                                                                .id);
-                                                        // ignore: use_build_context_synchronously
-                                                        Navigator.of(
-                                                            context)
-                                                            .pop();
-                                                        // ignore: use_build_context_synchronously
-                                                        showMessageDialog(
-                                                            context,
-                                                            'assets/ui/marque-el-circulo.png',
-                                                            'Correcto',
-                                                            'Se ha eliminado la postulación');
-                                                        setState(() {});
-                                                      } catch (e) {
-                                                        // ignore: use_build_context_synchronously
-                                                        showMessageDialog(
-                                                            context,
-                                                            'assets/ui/circulo-cruzado.png',
-                                                            'Error',
-                                                            'Ha ocurrido un error inesperado');
-                                                      }
-                                                    },
-                                                    style: ButtonStyle(
-                                                        backgroundColor:
-                                                        MaterialStateProperty.all(
-                                                            const Color(
-                                                                0xFF044086))),
-                                                    child: const Text(
-                                                        'Si',
-                                                        style: TextStyle(
-                                                            color: Colors
-                                                                .white))),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                const EdgeInsets.only(
-                                                    left: 5,
-                                                    right: 5),
-                                                child: ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.of(
-                                                          context)
-                                                          .pop();
-                                                    },
-                                                    style: ButtonStyle(
-                                                        backgroundColor:
-                                                        MaterialStateProperty.all(
-                                                            const Color(
-                                                                0xFF044086))),
-                                                    child: const Text(
-                                                        'No',
-                                                        style: TextStyle(
-                                                            color: Colors
-                                                                .white))),
-                                              ),
-                                            ],
-                                          )
-                                        ],
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        const Color(0xFF044086)),
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
-                                    );
-                                  });
-                            },
-                            child: const Text('Eliminar',
-                                style: TextStyle(color: Colors.white)),
-                          ),
-                        ],
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            alignment: Alignment.center,
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                if (postulation.status ==
+                                                    'Pendiente')
+                                                  const Text(
+                                                      '¿Estás seguro de que quieres confirmar la entevista?',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xFF3D5269),
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 18)),
+                                                if (postulation.status ==
+                                                    'Confirmado')
+                                                  const Text(
+                                                      '¿Estás seguro de que quieres Aprobar esta postulación?',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xFF3D5269),
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 18)),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 5,
+                                                              right: 5),
+                                                      child: ElevatedButton(
+                                                          onPressed: () async {
+                                                            try {
+                                                              if (postulation
+                                                                      .status ==
+                                                                  'Pendiente') {
+                                                                //sss
+                                                                enviarNotificacionConfirmado(
+                                                                    postulation);
+
+                                                                await postulationRemoteDatasourceImpl
+                                                                    .updatePostulationStatus(
+                                                                        widget
+                                                                            .id,
+                                                                        'Confirmado');
+
+                                                                // Enviar el correo electrÃ³nico notificando la actualizaciÃ³n
+                                                                String
+                                                                    formattedDate =
+                                                                    DateFormat(
+                                                                            'yyyy-MM-dd')
+                                                                        .format(
+                                                                            postulation.interview_date);
+                                                                String
+                                                                    messagetosend =
+                                                                    'Estimado padre/madre/tutor,\n\n'
+                                                                    'La fecha de la entrevista se ha confirmado para la fecha $formattedDate a las ${postulation.interview_hour} para el departamento de PsicologÃ­a.\n\n'
+                                                                    'Saludos cordiales,\n'
+                                                                    'Colegio Esclavas del Sagrado CorazÃ³n de JesÃºs';
+                                                                await sendEmail(
+                                                                  postulation
+                                                                      .email, // Reemplaza con el correo del destinatario
+                                                                  'ConfirmaciÃ³n de entrevista',
+                                                                  messagetosend,
+                                                                );
+                                                                // ignore: use_build_context_synchronously
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                                // ignore: use_build_context_synchronously
+                                                                showMessageDialog(
+                                                                    context,
+                                                                    'assets/ui/marque-el-circulo.png',
+                                                                    'Correcto',
+                                                                    'Se ha confirmado la entrevista');
+                                                              } else {
+                                                                actualizarCamposPostulacion(
+                                                                    widget.id);
+                                                                await postulationRemoteDatasourceImpl
+                                                                    .updatePostulationStatus(
+                                                                        widget
+                                                                            .id,
+                                                                        'Aprobado');
+                                                                //crear usuario
+                                                                crearUsuario(
+                                                                    postulation);
+                                                                enviarNotificacionAprovado(
+                                                                    postulation);
+                                                                // ignore: use_build_context_synchronously
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                                // ignore: use_build_context_synchronously
+                                                                showMessageDialog(
+                                                                    context,
+                                                                    'assets/ui/marque-el-circulo.png',
+                                                                    'Correcto',
+                                                                    'Postulación aprobada');
+                                                                if (postulation
+                                                                        .userID ==
+                                                                    '0') {
+                                                                  // ignore: use_build_context_synchronously
+                                                                  showMessageDialog(
+                                                                      context,
+                                                                      'assets/ui/marque-el-circulo.png',
+                                                                      'Datos de usuarios',
+                                                                      (fatherUserName != ''
+                                                                              ? 'Usuario del padre: $fatherUserName \nContraseña del padre: $fatherPassword\n'
+                                                                              : '') +
+                                                                          (motherUserName != ''
+                                                                              ? 'Usuario de la madre: $motherUserName \nContraseña de la madre: $motherPassword'
+                                                                              : ''));
+                                                                }
+                                                              }
+                                                              setState(() {});
+                                                            } catch (e) {
+                                                              // ignore: use_build_context_synchronously
+                                                              showMessageDialog(
+                                                                  context,
+                                                                  'assets/ui/circulo-cruzado.png',
+                                                                  'Error',
+                                                                  'Ha ocurrido un error inesperado');
+                                                            }
+                                                          },
+                                                          style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStateProperty.all(
+                                                                      const Color(
+                                                                          0xFF044086))),
+                                                          child: const Text(
+                                                              'Si',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white))),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 5,
+                                                              right: 5),
+                                                      child: ElevatedButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStateProperty.all(
+                                                                      const Color(
+                                                                          0xFF044086))),
+                                                          child: const Text(
+                                                              'No',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white))),
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          );
+                                        });
+                                  },
+                                  child: postulation.status == 'Pendiente'
+                                      ? const Text('Confirmar',
+                                          style: TextStyle(color: Colors.white))
+                                      : const Text('Aprobar',
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        const Color(0xFFd9534f)),
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            alignment: Alignment.center,
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Text(
+                                                    '¿Estás seguro de que quieres eliminar la postulación?',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        color:
+                                                            Color(0xFF3D5269),
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 18)),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 5,
+                                                              right: 5),
+                                                      child: ElevatedButton(
+                                                          onPressed: () async {
+                                                            try {
+                                                              await postulationRemoteDatasourceImpl
+                                                                  .deletePostulation(
+                                                                      widget
+                                                                          .id);
+                                                              // ignore: use_build_context_synchronously
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
+                                                              // ignore: use_build_context_synchronously
+                                                              showMessageDialog(
+                                                                  context,
+                                                                  'assets/ui/marque-el-circulo.png',
+                                                                  'Correcto',
+                                                                  'Se ha eliminado la postulación');
+                                                              setState(() {});
+                                                            } catch (e) {
+                                                              // ignore: use_build_context_synchronously
+                                                              showMessageDialog(
+                                                                  context,
+                                                                  'assets/ui/circulo-cruzado.png',
+                                                                  'Error',
+                                                                  'Ha ocurrido un error inesperado');
+                                                            }
+                                                          },
+                                                          style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStateProperty.all(
+                                                                      const Color(
+                                                                          0xFF044086))),
+                                                          child: const Text(
+                                                              'Si',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white))),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 5,
+                                                              right: 5),
+                                                      child: ElevatedButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
+                                                          },
+                                                          style: ButtonStyle(
+                                                              backgroundColor:
+                                                                  MaterialStateProperty.all(
+                                                                      const Color(
+                                                                          0xFF044086))),
+                                                          child: const Text(
+                                                              'No',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white))),
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          );
+                                        });
+                                  },
+                                  child: const Text('Eliminar',
+                                      style: TextStyle(color: Colors.white)),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      ),
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-
           await generatePdf(context, postulation);
         },
         child: Icon(Icons.download),
       ),
-
     );
   }
+
   Widget _buildNameBubble(String nombre) {
     return Chip(
       label: Text(nombre),
@@ -1586,6 +1774,7 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
       },
     );
   }
+
   Widget _buildSchoolBubble(String escuela) {
     return Chip(
       label: Text(escuela),
@@ -1607,7 +1796,7 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
         title: 'Entrevista confirmada',
         deviceToken: userToken,
         content:
-        'En fecha: ${postulation.interview_date.day} del ${postulation.interview_date.month} de ${postulation.interview_date.year}, se se confima la entrevista para el estudiante: ${postulation.student_name} ${postulation.student_lastname}',
+            'En fecha: ${postulation.interview_date.day} del ${postulation.interview_date.month} de ${postulation.interview_date.year}, se se confima la entrevista para el estudiante: ${postulation.student_name} ${postulation.student_lastname}',
         userId: postulation.userID,
         registerDate: DateTime.now());
     print(notification.content.toString());
@@ -1640,7 +1829,7 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
         title: 'Proceso de registro al sistema finalizado',
         deviceToken: userToken,
         content:
-        'El estudiante ${postulation.student_name} ${postulation.student_lastname} fue registrado en el sistema',
+            'El estudiante ${postulation.student_name} ${postulation.student_lastname} fue registrado en el sistema',
         userId: postulation.userID,
         registerDate: DateTime.now());
     print(notification.content.toString());
@@ -1686,11 +1875,11 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
       //padreid= consultaridpadreconSegunmadreID(motherId)
       //caso1 madreid exisite entonces se busca padreid mediante llave compartida,sacamos id de padre y lo inswertamos en en fatherid
       refId = new PersonaDataSourceImpl();
-      if(fatherId=='None'){
-        fatherId  =await refId.getFatherReference(motherId);
+      if (fatherId == 'None') {
+        fatherId = await refId.getFatherReference(motherId);
       }
-      if(motherId=='None'){
-        motherId  =await refId.getMotherReference(fatherId);
+      if (motherId == 'None') {
+        motherId = await refId.getMotherReference(fatherId);
       }
       Future.delayed(Duration(seconds: 2), () async {
         PersonaModel estudiante = PersonaModel(
@@ -1755,7 +1944,7 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
 
 // Validar si hay al menos dos apellidos
       String secondApellido =
-      fatherApellidos.length > 1 ? fatherApellidos[1] : '';
+          fatherApellidos.length > 1 ? fatherApellidos[1] : '';
 
 // Validar si el segundo apellido está vacío
       if (secondApellido.isEmpty) {
@@ -1766,9 +1955,9 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
 
 // Crear el nombre de usuario y contraseña
       fatherUserName =
-      "${postulation.father_name.substring(0, 3)}${fatherApellidos[0].substring(0, 2)}${secondApellido.substring(0, 2)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
+          "${postulation.father_name.substring(0, 3)}${fatherApellidos[0].substring(0, 2)}${secondApellido.substring(0, 2)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
       fatherPassword =
-      "${postulation.father_lastname.substring(0, 3)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
+          "${postulation.father_lastname.substring(0, 3)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
 
       // if (!secondApellido.isEmpty) {
       // Encriptar la contraseña con SHA-256
@@ -1799,10 +1988,6 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
         updatedate: DateTime.now(),
       );
 
-
-
-
-
       // Generar nombre de usuario y contraseña
 
       //List<String> motherApellidos = postulation.mother_lastname.split(' ');
@@ -1815,7 +2000,7 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
 
 // Validar si hay al menos dos apellidos
       String secondApellidomother =
-      motherApellidos.length > 1 ? motherApellidos[1] : '';
+          motherApellidos.length > 1 ? motherApellidos[1] : '';
 
 // Validar si el segundo apellido está vacío
       if (secondApellidomother.isEmpty) {
@@ -1826,9 +2011,9 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
 
 // Crear el nombre de usuario y contraseña
       motherUserName =
-      "${postulation.mother_name.substring(0, 3)}${motherApellidos[0].substring(0, 2)}${secondApellidomother.substring(0, 2)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
+          "${postulation.mother_name.substring(0, 3)}${motherApellidos[0].substring(0, 2)}${secondApellidomother.substring(0, 2)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
       motherPassword =
-      "${postulation.mother_lastname.substring(0, 3)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
+          "${postulation.mother_lastname.substring(0, 3)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
 
       // Encriptar la contraseña con SHA-256
       String encryptedMotherPassword = hashPassword(motherPassword);
@@ -1861,9 +2046,9 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
         _personaDataSource.registrarUsuario(estudiante);
         _personaDataSource.registrarUsuario(madre);
         _personaDataSource.registrarUsuario(padre);
-        addNewAccess(fatherPassword,padre.id);
+        addNewAccess(fatherPassword, padre.id);
         print('accesos añadietno 12345678');
-        addNewAccess(motherPassword,madre.id);
+        addNewAccess(motherPassword, madre.id);
       } catch (e) {}
     }
   }
@@ -1874,6 +2059,7 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
     var digest = sha256.convert(bytes);
     return digest.toString();
   }
+
   String encryptToBinary(String text) {
     StringBuffer binaryString = StringBuffer();
 
@@ -1885,9 +2071,11 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
 
     return binaryString.toString();
   }
-  void addNewAccess(String access,String refe) async {
+
+  void addNewAccess(String access, String refe) async {
     try {
-      AccessRemoteDataSourceImpl accessDataSource = AccessRemoteDataSourceImpl();
+      AccessRemoteDataSourceImpl accessDataSource =
+          AccessRemoteDataSourceImpl();
 
       // Crea un nuevo AccessModel como ejemplo
       AccessModel newAccess = AccessModel(
@@ -1907,7 +2095,7 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
   Future<void> actualizarCamposPostulacion(String postulationID) async {
     // Crear el mapa con los campos a actualizar
     Map<String, dynamic> camposAActualizar = {
-      'hermanosUEE': nombresEscuela,  // Ejemplo de valor booleano
+      'hermanosUEE': nombresEscuela, // Ejemplo de valor booleano
       'nombreHermano': nombresHermanos,
       'obs': obsController.text,
       //'fechaEntrevista': DateTime.now(),  // ya no lo usamos
@@ -1916,25 +2104,26 @@ class _PostulationDetails extends State<PostulationDetailsPsychology> {
       'recomendacionPsicologia': recomendacionPsicologiaController.text,
       'respuestaPPFF': respuestaPPFFController.text,
 
-      'fechaEntrevistaCoordinacion': postulation.fechaEntrevistaCoordinacion ,//postulation.fechaEntrevistaCoordinacion ,
+      'fechaEntrevistaCoordinacion': postulation
+          .fechaEntrevistaCoordinacion, //postulation.fechaEntrevistaCoordinacion ,
 
-      'vistoBuenoCoordinacion': 'rafa',  // Ejemplo de visto bueno
+      'vistoBuenoCoordinacion': 'rafa', // Ejemplo de visto bueno
       'respuestaAPpff': 'rafa',
       'administracion': 'Erick',
-      'recepcionDocumentos': 'erick',  // Confirmación de la recepción de documentos
+      'recepcionDocumentos':
+          'erick', // Confirmación de la recepción de documentos
       'estadoEntrevistaPsicologia': 'Aprovado',
       'estadoGeneral': 'Coordinacion',
       'estadoConfirmacion': 'Confirmado',
     };
 
     try {
-
       // Llamar al método updatePostulation para actualizar los campos
-      await postulationRemoteDatasourceImpl.updatePostulation(postulationID, camposAActualizar);
+      await postulationRemoteDatasourceImpl.updatePostulation(
+          postulationID, camposAActualizar);
       print('Campos de la postulación actualizados correctamente.');
     } catch (e) {
       print('Error al actualizar la postulación nuevos campos: $e');
     }
-
   }
 }

@@ -19,5 +19,6 @@
         "titleBar.inactiveForeground": "#e7e7e799"
     },
     "peacock.color": "#dd0531",
-    "doki.background.enabled": true
+    "doki.background.enabled": true,
+    "cmake.sourceDirectory": "C:/dev/pr_h23_irlandes_web/linux"
 }

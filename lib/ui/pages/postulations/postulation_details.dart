@@ -17,9 +17,11 @@ import 'package:http/http.dart' as http;
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:typed_data';
 import 'dart:html' as html;
+import 'package:pdf/pdf.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/services.dart' show rootBundle;
+
 class PostulationDetails extends StatefulWidget {
   final String id;
   const PostulationDetails({super.key, required this.id});
@@ -44,7 +46,8 @@ class _PostulationDetails extends State<PostulationDetails> {
   DateTime? _newInterviewDateTime;
 
   Future<void> sendEmail(String toEmail, String subject, String message) async {
-    final url = Uri.parse('http://localhost:3000/send-email'); // URL del servidor Node.js
+    final url = Uri.parse(
+        'http://localhost:3000/send-email'); // URL del servidor Node.js
 
     final response = await http.post(
       url,
@@ -62,6 +65,7 @@ class _PostulationDetails extends State<PostulationDetails> {
       print('Fallo al enviar el correo: ${response.body}');
     }
   }
+
   @override
   void initState() {
     postulationRemoteDatasourceImpl
@@ -74,8 +78,10 @@ class _PostulationDetails extends State<PostulationDetails> {
                   setState(() {
                     _markers.add(
                       Marker(
-                        markerId: MarkerId(postulation.toString()+postulation.longitude.toString()),
-                        position: LatLng(postulation.latitude, postulation.longitude),
+                        markerId: MarkerId(postulation.toString() +
+                            postulation.longitude.toString()),
+                        position:
+                            LatLng(postulation.latitude, postulation.longitude),
                         // infoWindow: InfoWindow(
                         //   title: 'New Marker',
                         //   snippet: 'Lat: ${widget.personModel.latitude}, Lng: ${widget.personModel.longitude}',
@@ -87,7 +93,6 @@ class _PostulationDetails extends State<PostulationDetails> {
                 }
             });
 
-
     super.initState();
   }
 
@@ -95,6 +100,7 @@ class _PostulationDetails extends State<PostulationDetails> {
   void dispose() {
     super.dispose();
   }
+
   final controllerLatitud = TextEditingController();
   final controllerLongitud = TextEditingController();
   //MARKERW BEGIN
@@ -133,18 +139,18 @@ class _PostulationDetails extends State<PostulationDetails> {
 
   final Set<Marker> _markers = {};
   //ssssssss
-  double _markerInfoLati =0;
-  double _markerInfoLong =0;
+  double _markerInfoLati = 0;
+  double _markerInfoLong = 0;
 
-  double _markLATI =0;
-  double _markLONG =0;
+  double _markLATI = 0;
+  double _markLONG = 0;
   void _onMapTapped(LatLng position) {
     setState(() {
       // Limpia el conjunto de marcadores antes de agregar uno nuevo
       _markers.clear();
       _markers.add(Marker(
         markerId:
-        MarkerId(position.toString()), // Usar la posición como ID único
+            MarkerId(position.toString()), // Usar la posición como ID único
         position: position,
         infoWindow: InfoWindow(
           title: 'New Marker',
@@ -153,21 +159,18 @@ class _PostulationDetails extends State<PostulationDetails> {
       ));
       setState(() {
         _markerInfoLati = position.latitude;
-        print('Latitude: $_markerInfoLati' );
-        _markLATI=_markerInfoLati;
+        print('Latitude: $_markerInfoLati');
+        _markLATI = _markerInfoLati;
         _markerInfoLong = position.longitude;
-        print('Latitude: $_markerInfoLong' );
-        _markLONG=_markerInfoLong;
-
+        print('Latitude: $_markerInfoLong');
+        _markLONG = _markerInfoLong;
       });
-
     });
 
     cambiar();
     //_writeToDirectionField();
   }
   // Campo de clase para almacenar la información del marcador
-
 
   String mostrarMarcador() {
     String latu = '';
@@ -183,17 +186,14 @@ class _PostulationDetails extends State<PostulationDetails> {
     ;
     return eje;
   }
-  void cambiar(){
-    controllerLatitud.text= _markerInfoLati.toString();
-    controllerLongitud.text= _markerInfoLong.toString();
+
+  void cambiar() {
+    controllerLatitud.text = _markerInfoLati.toString();
+    controllerLongitud.text = _markerInfoLong.toString();
   }
 
   String _varlo = "";
   //METODO CARGAR
-
-
-
-
 
   //METODO MAPAGOOGLE-FIN
 
@@ -243,101 +243,221 @@ class _PostulationDetails extends State<PostulationDetails> {
   }
 
   //PDF
- Future<void> generatePdf(BuildContext context, PostulationModel postulation) async {
-  final pdf = pw.Document();
+  Future<void> generatePdf(
+      BuildContext context, PostulationModel postulation) async {
+    try {
+      final pdf = pw.Document();
 
-  // Cargar la imagen del logo desde los assets
-  final ByteData bytes = await rootBundle.load('assets/ui/logo.png');
-  final Uint8List imageData = bytes.buffer.asUint8List();
-  final image = pw.MemoryImage(imageData);
+      // Cargar la imagen del logo desde los assets
+      final ByteData bytes = await rootBundle.load('assets/ui/logo.png');
+      final Uint8List imageData = bytes.buffer.asUint8List();
+      final image = pw.MemoryImage(imageData);
 
-  // Añadir una página al PDF
-  pdf.addPage(
-    pw.Page(
-      build: (pw.Context context) {
-        return pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            // Encabezado con el logo alineado a la derecha
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      // Definir estilos reutilizables
+      final titleStyle = pw.TextStyle(
+        fontSize: 20,
+        fontWeight: pw.FontWeight.bold,
+        color: PdfColors.blue800,
+      );
+
+      final headerStyle = pw.TextStyle(
+        fontSize: 16,
+        fontWeight: pw.FontWeight.bold,
+        color: PdfColors.blue700,
+      );
+
+      final contentStyle = pw.TextStyle(
+        fontSize: 14,
+        color: PdfColors.black,
+      );
+
+      // Añadir una página al PDF
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          margin: pw.EdgeInsets.all(30),
+          build: (pw.Context context) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Container(), // Espacio vacío para alinear el logo a la derecha
-                pw.Image(image, width: 100, height: 100), // Logo
+                // Encabezado con logo
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          'COLEGIO IRLANDÉS',
+                          style: headerStyle,
+                        ),
+                        pw.Text(
+                          'Sistema de Postulaciones',
+                          style: contentStyle.copyWith(
+                            fontStyle: pw.FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                    pw.Container(
+                      width: 80,
+                      height: 80,
+                      child: pw.Image(image, fit: pw.BoxFit.contain),
+                    ),
+                  ],
+                ),
+
+                pw.Divider(color: PdfColors.green, thickness: 1.5),
+                pw.SizedBox(height: 20),
+
+                // Título del documento
+                pw.Center(
+                  child:
+                      pw.Text('COMPROBANTE DE POSTULACIÓN', style: titleStyle),
+                ),
+                pw.SizedBox(height: 30),
+
+                // Sección de información del postulante
+                pw.Container(
+                  decoration: pw.BoxDecoration(
+                    color: PdfColors.green50,
+                    borderRadius: pw.BorderRadius.circular(5),
+                  ),
+                  padding: pw.EdgeInsets.all(15),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text('DATOS DEL POSTULANTE',
+                          style: headerStyle.copyWith(
+                            color: PdfColors.green800,
+                          )),
+                      pw.SizedBox(height: 15),
+
+                      // Tabla de información
+                      pw.Table(
+                        border: pw.TableBorder.all(
+                          color: PdfColors.green100,
+                          width: 1,
+                        ),
+                        columnWidths: {
+                          0: const pw.FlexColumnWidth(2),
+                          1: const pw.FlexColumnWidth(3),
+                        },
+                        children: [
+                          _buildTableRow(
+                              'Nombre completo:',
+                              '${postulation.student_name} ${postulation.student_lastname}',
+                              contentStyle),
+                          _buildTableRow(
+                              'Fecha de entrevista:',
+                              '${DateFormat('dd/MM/yyyy').format(postulation.interview_date)} ${postulation.interview_hour}',
+                              contentStyle),
+                          _buildTableRow(
+                              'Nivel y Grado:',
+                              '${postulation.level} - ${postulation.grade}',
+                              contentStyle),
+                          _buildTableRow('Unidad educativa:',
+                              postulation.institutional_unit, contentStyle),
+                          _buildTableRow(
+                              'Ciudad:', postulation.city, contentStyle),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                pw.SizedBox(height: 40),
+                pw.Divider(color: PdfColors.green, thickness: 1),
+                pw.Text(
+                  'Este documento es un comprobante oficial de la postulación realizada al sistema educativo.',
+                  style: contentStyle.copyWith(
+                    fontStyle: pw.FontStyle.italic,
+                    color: PdfColors.grey600,
+                  ),
+                  textAlign: pw.TextAlign.center,
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Generado el ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',
+                  style: contentStyle.copyWith(
+                    fontSize: 12,
+                    color: PdfColors.grey600,
+                  ),
+                  textAlign: pw.TextAlign.center,
+                ),
               ],
+            );
+          },
+        ),
+      );
+
+      // Guardar el PDF
+      final Uint8List pdfBytes = await pdf.save();
+
+      // Crear y descargar el archivo
+      final blob = html.Blob([pdfBytes], 'application/pdf');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final fileName =
+          'Postulacion_${postulation.student_name}_${postulation.student_lastname}.pdf';
+
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute("download", fileName)
+        ..style.color = 'green'
+        ..style.fontWeight = 'bold'
+        ..click();
+
+      html.Url.revokeObjectUrl(url);
+
+      // Mostrar notificación
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('PDF generado exitosamente'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al generar el PDF: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+// Función auxiliar para construir filas de la tabla
+  pw.TableRow _buildTableRow(String label, String value, pw.TextStyle style) {
+    return pw.TableRow(
+      decoration: const pw.BoxDecoration(
+        color: PdfColors.white,
+      ),
+      children: [
+        pw.Container(
+          padding: const pw.EdgeInsets.all(10),
+          color: PdfColors.green50,
+          child: pw.Text(
+            label,
+            style: style.copyWith(
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColors.green800,
             ),
-            pw.SizedBox(height: 20), // Espacio entre el logo y el contenido
-
-            // Contenido principal del PDF
-            pw.Center(
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.center,
-                children: [
-                  // Título del documento
-                  pw.Text(
-                    'Detalles de Postulación',
-                    style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
-                  ),
-                  pw.SizedBox(height: 10), // Espacio entre el título y los detalles
-
-                  // Detalles de la postulación
-                  pw.Text(
-                    'Fecha de entrevista: ${DateFormat('dd/MM/yyyy').format(postulation.interview_date)} ${postulation.interview_hour}',
-                    style: pw.TextStyle(fontSize: 14),
-                  ),
-                  pw.SizedBox(height: 5),
-                  pw.Text(
-                    'Nombre completo del postulante: ${postulation.student_name} ${postulation.student_lastname}',
-                    style: pw.TextStyle(fontSize: 14),
-                  ),
-                  pw.SizedBox(height: 5),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.center,
-                    children: [
-                      pw.Text('Nivel: ${postulation.level}', style: pw.TextStyle(fontSize: 14)),
-                      pw.SizedBox(width: 35),
-                      pw.Text('Grado: ${postulation.grade}', style: pw.TextStyle(fontSize: 14)),
-                    ],
-                  ),
-                  pw.SizedBox(height: 5),
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.center,
-                    children: [
-                      pw.Text('Unidad educativa de procedencia: ${postulation.institutional_unit}', style: pw.TextStyle(fontSize: 14)),
-                      pw.SizedBox(width: 35),
-                      pw.Text('Ciudad: ${postulation.city}', style: pw.TextStyle(fontSize: 14)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
-      },
-    ),
-  );
-
-  // Guardar el PDF en memoria como un blob
-  final Uint8List pdfBytes = await pdf.save();
-  final blob = html.Blob([pdfBytes]);
-
-  // Crear un enlace de descarga y simular un clic para descargar el archivo
-  final url = html.Url.createObjectUrlFromBlob(blob);
-  final anchor = html.AnchorElement(href: url)
-    ..setAttribute("download", "postulation_details_${postulation.student_name}_${postulation.student_lastname}.pdf")
-    ..click();
-
-  // Liberar el objeto URL creado
-  html.Url.revokeObjectUrl(url);
-
-  // Mostrar un mensaje de éxito al usuario
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text('PDF generado exitosamente'),
-      backgroundColor: Colors.green,
-    ),
-  );
-}
+          ),
+        ),
+        pw.Container(
+          padding: const pw.EdgeInsets.all(10),
+          child: pw.Text(
+            value,
+            style: style,
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -392,8 +512,6 @@ class _PostulationDetails extends State<PostulationDetails> {
                               style: TextStyle(
                                   color: Color(0xFF044086), fontSize: 18),
                             ),
-
-
                             InkWell(
                               onTap: () async {
                                 try {
@@ -402,7 +520,8 @@ class _PostulationDetails extends State<PostulationDetails> {
 
                                   final selectedDate = await showDatePicker(
                                     context: context,
-                                    initialDate: postulation.interview_date.isBefore(firstAllowedDate)
+                                    initialDate: postulation.interview_date
+                                            .isBefore(firstAllowedDate)
                                         ? DateTime.now()
                                         : postulation.interview_date,
                                     firstDate: firstAllowedDate,
@@ -412,7 +531,8 @@ class _PostulationDetails extends State<PostulationDetails> {
                                   if (selectedDate != null) {
                                     final selectedTime = await showTimePicker(
                                       context: context,
-                                      initialTime: TimeOfDay.fromDateTime(postulation.interview_date),
+                                      initialTime: TimeOfDay.fromDateTime(
+                                          postulation.interview_date),
                                     );
 
                                     if (selectedTime != null) {
@@ -434,7 +554,8 @@ class _PostulationDetails extends State<PostulationDetails> {
                               },
                               child: _newInterviewDateTime != null
                                   ? Text('${_newInterviewDateTime.toString()}')
-                                  : const Text('Seleccionar nueva fecha y hora'),
+                                  : const Text(
+                                      'Seleccionar nueva fecha y hora'),
                             ),
                             Text(
                               ('${DateFormat('dd/MM/yyyy').format(postulation.interview_date)} ${postulation.interview_hour}'),
@@ -444,34 +565,43 @@ class _PostulationDetails extends State<PostulationDetails> {
                             ElevatedButton(
                               onPressed: _newInterviewDateTime != null
                                   ? () async {
-                                try {
-                                  // Actualizar la fecha y hora de la entrevista en Firebase
-                                  await postulationRemoteDatasourceImpl.updateInterviewDateTime(
-                                    widget.id,
-                                    _newInterviewDateTime!,
-                                    TimeOfDay.fromDateTime(_newInterviewDateTime!).format(context),
-                                  );
+                                      try {
+                                        // Actualizar la fecha y hora de la entrevista en Firebase
+                                        await postulationRemoteDatasourceImpl
+                                            .updateInterviewDateTime(
+                                          widget.id,
+                                          _newInterviewDateTime!,
+                                          TimeOfDay.fromDateTime(
+                                                  _newInterviewDateTime!)
+                                              .format(context),
+                                        );
 
-                                  // Actualizar el estado del widget con la nueva fecha y hora
-                                  setState(() {
-                                    postulation.interview_date = _newInterviewDateTime!;
-                                    postulation.interview_hour = TimeOfDay.fromDateTime(_newInterviewDateTime!).format(context);
-                                    _newInterviewDateTime = null;
-                                  });
-                                  Fluttertoast.showToast(
-                                    msg: 'La fecha de la entrevista se ha actualizado correctamente',
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.BOTTOM,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.green,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0,
-                                  );
-                                } catch (e) {
-                                  print('Error updating interview date/time: $e');
-                                  // Optionally, show a dialog to inform the user about the error
-                                }
-                              }
+                                        // Actualizar el estado del widget con la nueva fecha y hora
+                                        setState(() {
+                                          postulation.interview_date =
+                                              _newInterviewDateTime!;
+                                          postulation.interview_hour =
+                                              TimeOfDay.fromDateTime(
+                                                      _newInterviewDateTime!)
+                                                  .format(context);
+                                          _newInterviewDateTime = null;
+                                        });
+                                        Fluttertoast.showToast(
+                                          msg:
+                                              'La fecha de la entrevista se ha actualizado correctamente',
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 1,
+                                          backgroundColor: Colors.green,
+                                          textColor: Colors.white,
+                                          fontSize: 16.0,
+                                        );
+                                      } catch (e) {
+                                        print(
+                                            'Error updating interview date/time: $e');
+                                        // Optionally, show a dialog to inform the user about the error
+                                      }
+                                    }
                                   : null,
                               child: const Text('Guardar cambios'),
                             ),
@@ -909,15 +1039,17 @@ class _PostulationDetails extends State<PostulationDetails> {
                             Padding(
                                 padding: const EdgeInsets.only(top: 20),
                                 child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       SizedBox(
-                                        width:  600 ,
-                                        height:  600 ,
+                                        width: 600,
+                                        height: 600,
                                         child: Container(
                                           color: Colors.blue,
                                           child: GoogleMap(
-                                            initialCameraPosition: CameraPosition(
+                                            initialCameraPosition:
+                                                CameraPosition(
                                               target: _initialPosition,
                                               zoom: 12,
                                             ),
@@ -926,14 +1058,12 @@ class _PostulationDetails extends State<PostulationDetails> {
                                             mapType: MapType.none,
                                             onMapCreated: _onMapCreated,
                                             onCameraMove: _onCameraMove,
-                                            minMaxZoomPreference: MinMaxZoomPreference(12, 18),
-
+                                            minMaxZoomPreference:
+                                                MinMaxZoomPreference(12, 18),
                                           ),
                                         ),
                                       ),
-                                    ]
-                                )
-                            ),
+                                    ])),
                             const SizedBox(
                               height: 25,
                             ),
@@ -1028,15 +1158,22 @@ class _PostulationDetails extends State<PostulationDetails> {
                                                                 enviarNotificacionConfirmado(
                                                                     postulation);
 
-
                                                                 // Enviar el correo electrÃ³nico notificando la actualizaciÃ³n
-                                                                String formattedDate = DateFormat('yyyy-MM-dd').format(postulation.interview_date);
-                                                                String messagetosend = 'Estimado padre/madre/tutor,\n\n'
+                                                                String
+                                                                    formattedDate =
+                                                                    DateFormat(
+                                                                            'yyyy-MM-dd')
+                                                                        .format(
+                                                                            postulation.interview_date);
+                                                                String
+                                                                    messagetosend =
+                                                                    'Estimado padre/madre/tutor,\n\n'
                                                                     'La fecha de la entrevista se ha confirmado para la fecha $formattedDate a las ${postulation.interview_hour} para el departamento de PsicologÃ­a.\n\n'
                                                                     'Saludos cordiales,\n'
                                                                     'Colegio Esclavas del Sagrado CorazÃ³n de JesÃºs';
                                                                 await sendEmail(
-                                                                  postulation.email, // Reemplaza con el correo del destinatario
+                                                                  postulation
+                                                                      .email, // Reemplaza con el correo del destinatario
                                                                   'ConfirmaciÃ³n de entrevista',
                                                                   messagetosend,
                                                                 );
@@ -1269,14 +1406,12 @@ class _PostulationDetails extends State<PostulationDetails> {
                 },
               ),
             ),
-                      floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              
-              await generatePdf(context, postulation);
-            },
-            child: Icon(Icons.download),
-          ),
-
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await generatePdf(context, postulation);
+        },
+        child: Icon(Icons.download),
+      ),
     );
   }
 
@@ -1368,11 +1503,11 @@ class _PostulationDetails extends State<PostulationDetails> {
       //padreid= consultaridpadreconSegunmadreID(motherId)
       //caso1 madreid exisite entonces se busca padreid mediante llave compartida,sacamos id de padre y lo inswertamos en en fatherid
       refId = new PersonaDataSourceImpl();
-      if(fatherId=='None'){
-        fatherId  =await refId.getFatherReference(motherId);
+      if (fatherId == 'None') {
+        fatherId = await refId.getFatherReference(motherId);
       }
-      if(motherId=='None'){
-        motherId  =await refId.getMotherReference(fatherId);
+      if (motherId == 'None') {
+        motherId = await refId.getMotherReference(fatherId);
       }
       Future.delayed(Duration(seconds: 2), () async {
         PersonaModel estudiante = PersonaModel(
@@ -1453,7 +1588,7 @@ class _PostulationDetails extends State<PostulationDetails> {
           "${postulation.father_lastname.substring(0, 3)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
 
       // if (!secondApellido.isEmpty) {
-          // Encriptar la contraseña con SHA-256
+      // Encriptar la contraseña con SHA-256
       String encryptedFatherPassword = hashPassword(fatherPassword);
       PersonaModel padre = PersonaModel(
         username: fatherUserName,
@@ -1480,10 +1615,6 @@ class _PostulationDetails extends State<PostulationDetails> {
         fatherReference: 'None',
         updatedate: DateTime.now(),
       );
-       
-  
-      
-      
 
       // Generar nombre de usuario y contraseña
 
@@ -1543,9 +1674,9 @@ class _PostulationDetails extends State<PostulationDetails> {
         _personaDataSource.registrarUsuario(estudiante);
         _personaDataSource.registrarUsuario(madre);
         _personaDataSource.registrarUsuario(padre);
-        addNewAccess(fatherPassword,padre.id);
+        addNewAccess(fatherPassword, padre.id);
         print('accesos añadietno 12345678');
-        addNewAccess(motherPassword,madre.id);
+        addNewAccess(motherPassword, madre.id);
       } catch (e) {}
     }
   }
@@ -1556,6 +1687,7 @@ class _PostulationDetails extends State<PostulationDetails> {
     var digest = sha256.convert(bytes);
     return digest.toString();
   }
+
   String encryptToBinary(String text) {
     StringBuffer binaryString = StringBuffer();
 
@@ -1567,9 +1699,11 @@ class _PostulationDetails extends State<PostulationDetails> {
 
     return binaryString.toString();
   }
-  void addNewAccess(String access,String refe) async {
+
+  void addNewAccess(String access, String refe) async {
     try {
-      AccessRemoteDataSourceImpl accessDataSource = AccessRemoteDataSourceImpl();
+      AccessRemoteDataSourceImpl accessDataSource =
+          AccessRemoteDataSourceImpl();
 
       // Crea un nuevo AccessModel como ejemplo
       AccessModel newAccess = AccessModel(

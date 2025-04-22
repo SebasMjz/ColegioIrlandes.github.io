@@ -26,46 +26,48 @@ import 'dart:math';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
-
 class RegisterPostulationHardCoded extends StatefulWidget {
   const RegisterPostulationHardCoded({super.key});
 
   @override
-  State<RegisterPostulationHardCoded> createState() => _RegisterPostulationHardCoded();
+  State<RegisterPostulationHardCoded> createState() =>
+      _RegisterPostulationHardCoded();
 }
 
-class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> {
-
+class _RegisterPostulationHardCoded
+    extends State<RegisterPostulationHardCoded> {
   Future<bool> _confirmLogoutDialog(BuildContext context) async {
     return await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Cerrar Sesión'),
-          content: const Text('¿Estás seguro de que quieres cerrar sesión?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false); // No
-              },
-              child: const Text('No'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true); // Sí
-              },
-              child: const Text('Sí'),
-            ),
-          ],
-        );
-      },
-    ) ?? false; // Por defecto, no cerrar sesión si se cierra el diálogo
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Cerrar Sesión'),
+              content:
+                  const Text('¿Estás seguro de que quieres cerrar sesión?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false); // No
+                  },
+                  child: const Text('No'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true); // Sí
+                  },
+                  child: const Text('Sí'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false; // Por defecto, no cerrar sesión si se cierra el diálogo
   }
   //hardcoded
 
   PersonaDataSourceImpl _personaDataSource = PersonaDataSourceImpl();
   final NotificationRemoteDataSourceImpl notificationRemoteDataSource =
-  NotificationRemoteDataSourceImpl();
+      NotificationRemoteDataSourceImpl();
   late PostulationModel postulation;
   // bool isLoading = true;
   String fatherUserName = '';
@@ -76,9 +78,9 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
   List<PostulationModel> postulationsList = [];
 
   InterviewScheduleRemoteDatasourceImpl scheduleRemoteDatasourceImpl =
-  InterviewScheduleRemoteDatasourceImpl();
+      InterviewScheduleRemoteDatasourceImpl();
   PostulationRemoteDatasourceImpl postulationRemoteDatasourceImpl =
-  PostulationRemoteDatasourceImpl();
+      PostulationRemoteDatasourceImpl();
   TextEditingController dateController = TextEditingController();
   TextEditingController schoolController = TextEditingController();
   TextEditingController cityController = TextEditingController();
@@ -119,26 +121,24 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
       // Si está fuera de los límites, mover la cámara de vuelta a Cochabamba
       _mapController
           .animateCamera(CameraUpdate.newLatLngBounds(_cochabambaBounds, 0));
-      _mapController!.animateCamera(
-          CameraUpdate.newLatLngZoom(
-            _initialPosition,
-            12, // Zoom level
-          ));
-
+      _mapController!.animateCamera(CameraUpdate.newLatLngZoom(
+        _initialPosition,
+        12, // Zoom level
+      ));
     }
   }
 
   final Set<Marker> _markers = {};
   //ssssssss
-  double _markerInfoLati =0;
-  double _markerInfoLong =0;
+  double _markerInfoLati = 0;
+  double _markerInfoLong = 0;
   void _onMapTapped(LatLng position) {
     setState(() {
       // Limpia el conjunto de marcadores antes de agregar uno nuevo
       _markers.clear();
       _markers.add(Marker(
         markerId:
-        MarkerId(position.toString()), // Usar la posición como ID único
+            MarkerId(position.toString()), // Usar la posición como ID único
         position: position,
         //infoWindow: InfoWindow(
         //title: 'Sus coordenadas son',
@@ -148,10 +148,8 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
     });
 
     _writeToDirectionField();
-
   }
   // Campo de clase para almacenar la información del marcador
-
 
   String mostrarMarcador() {
     String latu = '';
@@ -178,6 +176,7 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
       _isExpanded = !_isExpanded;
     });
   }
+
   void _centerMapOnCochabamba() {
     if (_mapController != null) {
       _mapController!.animateCamera(
@@ -188,6 +187,7 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
       );
     }
   }
+
   void _writeToDirectionField() {
     setState(() {
       if (_markers.isNotEmpty) {
@@ -217,39 +217,39 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
   @override
   void initState() {
     scheduleRemoteDatasourceImpl.getActiveInterviewSchedule().then((value) => {
-      isLoading = true,
-      if (value != null)
-        {
-          endDate = format.parse(value.limit_date),
-          if (endDate.isAfter(startDate))
+          isLoading = true,
+          if (value != null)
             {
-              startTime = value.start_time,
-              endTime = value.end_time,
-              times =
-                  generateTimeSlots(value.start_time, value.end_time, 1),
-              days = value.days,
-              isScheduleActive = true,
+              endDate = format.parse(value.limit_date),
+              if (endDate.isAfter(startDate))
+                {
+                  startTime = value.start_time,
+                  endTime = value.end_time,
+                  times =
+                      generateTimeSlots(value.start_time, value.end_time, 1),
+                  days = value.days,
+                  isScheduleActive = true,
+                }
+            },
+          if (mounted)
+            {
+              setState(() {
+                isLoading = false;
+              })
             }
-        },
-      if (mounted)
-        {
-          setState(() {
-            isLoading = false;
-          })
-        }
-    });
+        });
     postulationRemoteDatasourceImpl
         .getPostulationsAfterDate(startDate)
         .then((value) => {
-      isLoading = true,
-      postulationsList = value,
-      if (mounted)
-        {
-          setState(() {
-            isLoading = false;
-          })
-        }
-    });
+              isLoading = true,
+              postulationsList = value,
+              if (mounted)
+                {
+                  setState(() {
+                    isLoading = false;
+                  })
+                }
+            });
     super.initState();
   }
 
@@ -343,7 +343,7 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
     }
 
     DateTime currentMonday =
-    resetTime(startDate.subtract(Duration(days: startDate.weekday - 1)));
+        resetTime(startDate.subtract(Duration(days: startDate.weekday - 1)));
 
     while (currentMonday.isBefore(endDate)) {
       List<DateTime> week = [];
@@ -428,7 +428,9 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
         toolbarHeight: 75,
         elevation: 0,
         actions: [
-          IconButton(iconSize:25, icon: const Image(image: AssetImage('assets/ui/cerrarsesion.png') ),
+          IconButton(
+            iconSize: 25,
+            icon: const Image(image: AssetImage('assets/ui/cerrarsesion.png')),
             onPressed: () async {
               // Pregunta al usuario si desea cerrar sesión
               bool confirmLogout = await _confirmLogoutDialog(context);
@@ -448,1091 +450,1184 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : !isScheduleActive
-          ? const Center(
-        child: Text(
-          'Las postulaciones no estan activas',
-          style: TextStyle(
-              color: Color(0xFF044086),
-              fontSize: 20,
-              fontWeight: FontWeight.bold),
-        ),
-      )
-          : Center(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Container(
-              width: constraints.maxWidth * 0.6,
-              constraints: const BoxConstraints(
-                minWidth: 700.0,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE3E9F4),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(50),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              decoration: customDecoration('Nivel'),
-                              isDense: true,
-                              items: ['Inicial', 'Primaria', 'Secundaria']
-                                  .map((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                level = value!;
-                                switch (value) {
-                                  case 'Inicial':
-                                    gradeList = ['1ra sección','2da sección'];
-                                    grade = gradeList[0];
-                                    break;
-                                  default:
-                                    gradeList = ['1er','2do','3er','4to','5to', '6to'];
-                                    grade = gradeList[0];
-                                }
-                                setState(() {});
-                              },
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              isDense: true,
-                              decoration:customDecoration('Curso'),
-                              value: gradeList.isNotEmpty ? grade:'',
-                              items: gradeList.map((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                grade = value!;
-                                setState(() {});
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      CustomTextField(
-                        label: 'Unidad educativa de procedencia',
-                        controller: schoolController,
-                        maxLength: 40,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.allow(RegExp(
-                              r"[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ'.\s-]")),
-                          FilteringTextInputFormatter.deny(
-                              RegExp(r'\s\s+')),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      CustomTextField(
-                        label: 'Ciudad',
-                        controller: cityController,
-                        maxLength: 20,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.deny(
-                              RegExp(r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                          FilteringTextInputFormatter.deny(
-                              RegExp(r'\s\s+')),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Postulante',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Color(0xFF044086),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
+              ? const Center(
+                  child: Text(
+                    'Las postulaciones no estan activas',
+                    style: TextStyle(
+                        color: Color(0xFF044086),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
+                )
+              : Center(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Container(
+                        width: constraints.maxWidth * 0.6,
+                        constraints: const BoxConstraints(
+                          minWidth: 700.0,
                         ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE3E9F4),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.all(50),
                             child: Column(
                               children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: DropdownButtonFormField<String>(
+                                        decoration: customDecoration('Nivel'),
+                                        isDense: true,
+                                        items: [
+                                          'Inicial',
+                                          'Primaria',
+                                          'Secundaria'
+                                        ].map((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          level = value!;
+                                          switch (value) {
+                                            case 'Inicial':
+                                              gradeList = [
+                                                '1ra sección',
+                                                '2da sección'
+                                              ];
+                                              grade = gradeList[0];
+                                              break;
+                                            default:
+                                              gradeList = [
+                                                '1er',
+                                                '2do',
+                                                '3er',
+                                                '4to',
+                                                '5to',
+                                                '6to'
+                                              ];
+                                              grade = gradeList[0];
+                                          }
+                                          setState(() {});
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 20,
+                                    ),
+                                    Expanded(
+                                      child: DropdownButtonFormField<String>(
+                                        isDense: true,
+                                        decoration: customDecoration('Curso'),
+                                        value:
+                                            gradeList.isNotEmpty ? grade : '',
+                                        items: gradeList.map((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          grade = value!;
+                                          setState(() {});
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
                                 CustomTextField(
-                                  label: 'Nombres',
-                                  controller: studentNameController,
+                                  label: 'Unidad educativa de procedencia',
+                                  controller: schoolController,
                                   maxLength: 40,
-                                  type: TextInputType.name,
                                   inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(
-                                            r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                    FilteringTextInputFormatter.allow(RegExp(
+                                        r"[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ'.\s-]")),
                                     FilteringTextInputFormatter.deny(
                                         RegExp(r'\s\s+')),
                                   ],
                                 ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                CustomTextField(
+                                  label: 'Ciudad',
+                                  controller: cityController,
+                                  maxLength: 20,
+                                  inputFormatters: <TextInputFormatter>[
+                                    FilteringTextInputFormatter.deny(
+                                        RegExp(r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                    FilteringTextInputFormatter.deny(
+                                        RegExp(r'\s\s+')),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 25,
+                                ),
+                                const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Postulante',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        color: Color(0xFF044086),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomTextField(
+                                            label: 'Nombres',
+                                            controller: studentNameController,
+                                            maxLength: 40,
+                                            type: TextInputType.name,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter.deny(
+                                                  RegExp(
+                                                      r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                              FilteringTextInputFormatter.deny(
+                                                  RegExp(r'\s\s+')),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Flexible(
+                                                child: Container(
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            bottom: 25),
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        foreign == ''
+                                                            ? foreign = 'E-'
+                                                            : foreign = '';
+                                                        setState(() {});
+                                                      },
+                                                      child: MouseRegion(
+                                                        cursor:
+                                                            SystemMouseCursors
+                                                                .click,
+                                                        child: Container(
+                                                          height: 30,
+                                                          width: 30,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: foreign != ''
+                                                                ? const Color(
+                                                                    0xFF044086)
+                                                                : Colors.grey,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5),
+                                                          ),
+                                                          child: const Center(
+                                                            child: Text(
+                                                              'E',
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )),
+                                              ),
+                                              const SizedBox(width: 3),
+                                              Container(
+                                                margin: const EdgeInsets.only(
+                                                    bottom: 25),
+                                                child: const Text('-',
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 24)),
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Flexible(
+                                                flex: 10,
+                                                child: CustomTextField(
+                                                  label: 'CI',
+                                                  controller:
+                                                      studentCIController,
+                                                  maxLength: 10,
+                                                  inputFormatters: [
+                                                    FilteringTextInputFormatter
+                                                        .allow(
+                                                            RegExp(r'[0-9]')),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Flexible(
+                                                flex: 3,
+                                                child: CustomTextField(
+                                                  label: 'Complemento',
+                                                  controller:
+                                                      complementController,
+                                                  maxLength: 3,
+                                                  inputFormatters: [
+                                                    FilteringTextInputFormatter
+                                                        .allow(
+                                                            RegExp(r'[a-z]')),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          DropdownButtonFormField<String>(
+                                            isDense: true,
+                                            decoration:
+                                                customDecoration('Género'),
+                                            items: ['Masculino', 'Femenino']
+                                                .map((String value) {
+                                              return DropdownMenuItem<String>(
+                                                value: value,
+                                                child: Text(value),
+                                              );
+                                            }).toList(),
+                                            onChanged: (value) {
+                                              gender = value!;
+                                              setState(() {});
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 20,
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomTextField(
+                                            label: 'Apellidos',
+                                            controller:
+                                                studentLastnameController,
+                                            maxLength: 40,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter.deny(
+                                                  RegExp(
+                                                      r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                              FilteringTextInputFormatter.deny(
+                                                  RegExp(r'\s\s+')),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          TextFormField(
+                                            controller: dateController,
+                                            decoration: customDecoration(
+                                                'Fecha de nacimiento'),
+                                            readOnly: true,
+                                            onTap: () async {
+                                              DateTime? pickedDate =
+                                                  await showDatePicker(
+                                                context: context,
+                                                initialDate: DateTime(
+                                                    DateTime.now().year - 5),
+                                                firstDate: DateTime(
+                                                    DateTime.now().year - 25),
+                                                lastDate: DateTime.now(),
+                                              );
+                                              if (pickedDate != null) {
+                                                DateTime currentDate =
+                                                    DateTime.now();
+                                                DateTime justDate = DateTime(
+                                                    currentDate.year,
+                                                    currentDate.month,
+                                                    currentDate.day);
+
+                                                if (pickedDate.isAtSameMomentAs(
+                                                    justDate)) {
+                                                  dateController.text = '';
+                                                } else {
+                                                  String formattedDate =
+                                                      DateFormat('dd/MM/yyyy')
+                                                          .format(pickedDate);
+                                                  dateController.text =
+                                                      formattedDate.toString();
+                                                }
+                                              } else {
+                                                if (dateController.text == '') {
+                                                  // ignore: use_build_context_synchronously
+                                                  showMessageDialog(
+                                                      context,
+                                                      'assets/ui/circulo-cruzado.png',
+                                                      'Error',
+                                                      'Debe marcar una fecha');
+                                                }
+                                              }
+                                              setState(() {});
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 25,
+                                ),
+                                const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Padre',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        color: Color(0xFF044086),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomTextField(
+                                            label: 'Nombres',
+                                            controller: fatherNameController,
+                                            maxLength: 40,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter.deny(
+                                                  RegExp(
+                                                      r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                              FilteringTextInputFormatter.deny(
+                                                  RegExp(r'\s\s+')),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          CustomTextField(
+                                            label: 'Número de celular',
+                                            controller:
+                                                fatherCellphoneController,
+                                            maxLength: 12,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'[0-9]')),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 25,
+                                    ),
+                                    Expanded(
+                                      child: CustomTextField(
+                                        label: 'Apellidos',
+                                        controller: fatherLastnameController,
+                                        maxLength: 40,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(
+                                                  r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\s\s+')),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 25,
+                                ),
+                                const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Madre',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        color: Color(0xFF044086),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          CustomTextField(
+                                            label: 'Nombres',
+                                            controller: motherNameController,
+                                            maxLength: 40,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter.deny(
+                                                  RegExp(
+                                                      r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                              FilteringTextInputFormatter.deny(
+                                                  RegExp(r'\s\s+')),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          CustomTextField(
+                                            label: 'Número de celular',
+                                            controller:
+                                                motherCellphoneController,
+                                            maxLength: 12,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter.allow(
+                                                  RegExp(r'[0-9]')),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 25,
+                                    ),
+                                    Expanded(
+                                      child: CustomTextField(
+                                        label: 'Apellidos',
+                                        controller: motherLastnameController,
+                                        maxLength: 40,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(
+                                                  r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\s\s+')),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Datos de contacto',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        color: Color(0xFF044086),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: CustomTextField(
+                                        label: 'Teléfono',
+                                        controller: phoneController,
+                                        maxLength: 10,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp(r'[0-9]')),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 25,
+                                    ),
+                                    Expanded(
+                                      child: CustomTextField(
+                                        label: 'Correo electrónico',
+                                        controller: emailController,
+                                        maxLength: 30,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r"[&=_\s\'\-+,<>]")),
+                                          FilteringTextInputFormatter.deny(
+                                              RegExp(r'\.\.+')),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Direccion geografica del estudiante',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        color: Color(0xFF044086),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Ubicacion : *",
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.blue[900])),
+                                          SizedBox(
+                                            width: 300,
+                                            height: 500,
+                                            child: Container(
+                                              color: Colors.blue,
+                                              child: GoogleMap(
+                                                initialCameraPosition:
+                                                    CameraPosition(
+                                                  target: _initialPosition,
+                                                  zoom: 12,
+                                                ),
+                                                onTap: _onMapTapped,
+                                                markers: _markers,
+                                                mapType: MapType.none,
+                                                onMapCreated: _onMapCreated,
+                                                onCameraMove: _onCameraMove,
+                                                minMaxZoomPreference:
+                                                    MinMaxZoomPreference(
+                                                        12, 18),
+                                              ),
+                                            ),
+                                          ),
+                                          // ElevatedButton(
+                                          //   onPressed: () {
+                                          //     setState(() {
+                                          //       _expanded = !_expanded;
+                                          //     });
+                                          //   },
+                                          //   child: Text(_expanded ? 'Restaurar' : 'Expandir'),
+                                          // ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _centerMapOnCochabamba();
+                                              });
+                                            },
+                                            child: Text('Centrar en Cbba'),
+                                          ),
+                                        ])),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Flexible(
-                                      child: Container(
-                                          margin: const EdgeInsets.only(bottom: 25),
-                                          child: GestureDetector(
-                                            onTap:() {
-                                              foreign ==''? foreign = 'E-' : foreign = '';
-                                              setState(() {});
-                                            },
-                                            child: MouseRegion(
-                                              cursor: SystemMouseCursors.click,
-                                              child: Container(
-                                                height: 30,
-                                                width: 30,
-                                                decoration: BoxDecoration(
-                                                  color: foreign !='' ? const Color(0xFF044086) : Colors.grey,
-                                                  borderRadius: BorderRadius.circular(5),
-                                                ),
-                                                child: const Center(
-                                                  child: Text(
-                                                    'E',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
+                                    const Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        'Fecha de entrevista',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            color: Color(0xFF044086),
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                        icon: Image.asset(
+                                          'assets/ui/interrogatorio.png',
+                                          width: 20,
+                                        ),
+                                        onPressed: () {
+                                          needColorHelp = !needColorHelp;
+                                          setState(() {});
+                                        }),
+                                  ],
+                                ),
+                                if (needColorHelp)
+                                  Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 60.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            spreadRadius: 1,
+                                            blurRadius: 1,
+                                            offset: Offset(0, 1),
+                                          ),
+                                        ],
+                                      ),
+                                      child: const Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Significado de los colores',
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                                color: Color(0xFF044086),
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          ColorHelp(
+                                              color: Color(0x5F9E9E9E),
+                                              text: 'No disponible'),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          ColorHelp(
+                                              color: Color(0xFF9E9E9E),
+                                              text: 'Disponible'),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          ColorHelp(
+                                              color: Color(0xFFd9534f),
+                                              text: 'Ocupado'),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          ColorHelp(
+                                              color: Color(0xFF198754),
+                                              text: 'Seleccionado'),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                        ],
+                                      )),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                if (selectedHour.isNotEmpty)
+                                  Align(
+                                    alignment: Alignment.topCenter,
+                                    child: Text(
+                                      ('${DateFormat('dd/MM/yyyy').format(selectedDay)} $selectedHour'),
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                          color: Color(0xFF044086),
+                                          fontSize: 18),
+                                    ),
+                                  ),
+                                SizedBox(
+                                  child: CarouselSlider.builder(
+                                    carouselController: _carouselController,
+                                    itemCount: weeks.length,
+                                    itemBuilder:
+                                        (context, carouselIndex, realIndex) {
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 1,
+                                              blurRadius: 1,
                                             ),
-                                          )
-                                      ),
-                                    ),
-                                    const SizedBox(width: 3),
-                                    Container(
-                                      margin: const EdgeInsets.only(bottom: 25),
-                                      child: const Text('-', style: TextStyle(color: Colors.black, fontSize: 24)),
-                                    ),
+                                          ],
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: GridView.builder(
+                                            gridDelegate:
+                                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 6,
+                                              childAspectRatio: 1.5,
+                                              mainAxisSpacing: 10.0,
+                                              crossAxisSpacing: 10.0,
+                                            ),
+                                            itemBuilder: (context, gridIndex) {
+                                              int rowIndex = gridIndex ~/ 6;
+                                              int columnIndex = gridIndex % 6;
 
-                                    const SizedBox(width: 5),
-                                    Flexible(
-                                      flex: 10,
-                                      child: CustomTextField(
-                                        label: 'CI',
-                                        controller: studentCIController,
-                                        maxLength: 10,
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'[0-9]')
+                                              if (columnIndex == 0) {
+                                                return Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Text(times[rowIndex],
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Color(
+                                                                0xFF044086))),
+                                                    if (rowIndex != 0)
+                                                      const VerticalDivider(),
+                                                  ],
+                                                );
+                                              } else {
+                                                if (rowIndex == 0) {
+                                                  DateTime day =
+                                                      weeks[carouselIndex]
+                                                          [columnIndex - 1];
+                                                  return Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                          DateFormat(
+                                                                  'E', 'ES_es')
+                                                              .format(day),
+                                                          style: const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: Color(
+                                                                  0xFF044086))),
+                                                      Text(
+                                                          DateFormat('d MMM',
+                                                                  'ES_es')
+                                                              .format(day),
+                                                          style: const TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              color: Color(
+                                                                  0xFF044086))),
+                                                      const Divider(
+                                                        height: 2,
+                                                      ),
+                                                    ],
+                                                  );
+                                                } else {
+                                                  DateTime day =
+                                                      weeks[carouselIndex]
+                                                          [columnIndex - 1];
+                                                  String formattedDay =
+                                                      DateFormat(
+                                                              'EEEE', 'ES_es')
+                                                          .format(day)
+                                                          .toLowerCase();
+                                                  bool isSelected =
+                                                      selectedDay == day &&
+                                                          selectedHour ==
+                                                              times[rowIndex];
+
+                                                  int status = postulationsList.any((d) =>
+                                                          DateTime(
+                                                                  d.interview_date
+                                                                      .year,
+                                                                  d.interview_date
+                                                                      .month,
+                                                                  d.interview_date
+                                                                      .day) ==
+                                                              day &&
+                                                          d.interview_hour ==
+                                                              times[rowIndex])
+                                                      ? 1
+                                                      : 2;
+
+                                                  if (endDate.isBefore(day) ||
+                                                      startDate.isAfter(day) ||
+                                                      !days.any((d) =>
+                                                          d.toLowerCase() ==
+                                                          formattedDay)) {
+                                                    status = 0;
+                                                  }
+
+                                                  return HourButton(
+                                                    isSelected: isSelected,
+                                                    status: status,
+                                                    onTap: () {
+                                                      if (status == 2) {
+                                                        selectedDay = day;
+                                                        selectedHour =
+                                                            times[rowIndex];
+                                                        setState(() {});
+                                                      }
+                                                    },
+                                                  );
+                                                }
+                                              }
+                                            },
+                                            itemCount: times.length * 6,
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      );
+                                    },
+                                    options: CarouselOptions(
+                                      enlargeCenterPage: true,
+                                      enableInfiniteScroll: false,
+                                      viewportFraction: 0.8,
                                     ),
-                                    const SizedBox(width: 5),
-                                    Flexible(
-                                      flex: 3,
-                                      child: CustomTextField(
-                                        label: 'Complemento',
-                                        controller: complementController,
-                                        maxLength: 3,
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.allow(
-                                              RegExp(r'[a-z]')
-                                          ),
-                                        ],
-                                      ),
+                                  ),
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.arrow_back),
+                                      onPressed: () {
+                                        _carouselController.previousPage();
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.arrow_forward),
+                                      onPressed: () {
+                                        _carouselController.nextPage();
+                                      },
                                     ),
                                   ],
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                DropdownButtonFormField<String>(
-                                  isDense: true,
-                                  decoration:
-                                  customDecoration('Género'),
-                                  items: ['Masculino', 'Femenino']
-                                      .map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    gender = value!;
-                                    setState(() {});
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Expanded(
-                            child: Column(
-                              children: [
-                                CustomTextField(
-                                  label: 'Apellidos',
-                                  controller:
-                                  studentLastnameController,
-                                  maxLength: 40,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(
-                                            r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(r'\s\s+')),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                TextFormField(
-                                  controller: dateController,
-                                  decoration: customDecoration(
-                                      'Fecha de nacimiento'),
-                                  readOnly: true,
-                                  onTap: () async {
-                                    DateTime? pickedDate =
-                                    await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime(
-                                          DateTime.now().year - 5),
-                                      firstDate: DateTime(
-                                          DateTime.now().year - 25),
-                                      lastDate: DateTime.now(),
-                                    );
-                                    if (pickedDate != null) {
-                                      DateTime currentDate =
-                                      DateTime.now();
-                                      DateTime justDate = DateTime(
-                                          currentDate.year,
-                                          currentDate.month,
-                                          currentDate.day);
+                                const SizedBox(height: 20),
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        const Color(0xFF044086)),
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    final bool emailValid = RegExp(
+                                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+                                        .hasMatch(emailController.text);
+                                    if (areAllFieldsFilled()) {
+                                      if ((fatherCellphoneController.text !=
+                                                  '' &&
+                                              fatherLastnameController
+                                                      .text !=
+                                                  '' &&
+                                              fatherNameController
+                                                      .text !=
+                                                  '') ||
+                                          (motherCellphoneController
+                                                      .text !=
+                                                  '' &&
+                                              motherLastnameController.text !=
+                                                  '' &&
+                                              motherNameController.text !=
+                                                  '')) {
+                                        if (emailValid) {
+                                          if (selectedHour.trim().isNotEmpty) {
+                                            showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return AlertDialog(
+                                                    alignment: Alignment.center,
+                                                    content: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        const Text(
+                                                            '¿Estás seguro de que quieres enviar el formulario?',
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: TextStyle(
+                                                                color: Color(
+                                                                    0xFF3D5269),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 18)),
+                                                        const SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      left: 5,
+                                                                      right: 5),
+                                                              child:
+                                                                  ElevatedButton(
+                                                                      onPressed:
+                                                                          () async {
+                                                                        DateFormat
+                                                                            format =
+                                                                            DateFormat("dd/MM/yyyy");
+                                                                        DateTime
+                                                                            birth_day =
+                                                                            format.parse(dateController.text);
+                                                                        try {
+                                                                          if (fatherCellphoneController.text == '' ||
+                                                                              fatherLastnameController.text == '' ||
+                                                                              fatherNameController.text == '') {
+                                                                            fatherCellphoneController.text =
+                                                                                '';
+                                                                            fatherLastnameController.text =
+                                                                                '';
+                                                                            fatherNameController.text =
+                                                                                '';
+                                                                          }
+                                                                          if (motherCellphoneController.text == '' ||
+                                                                              motherLastnameController.text == '' ||
+                                                                              motherNameController.text == '') {
+                                                                            motherCellphoneController.text =
+                                                                                '';
+                                                                            motherLastnameController.text =
+                                                                                '';
+                                                                            motherNameController.text =
+                                                                                '';
+                                                                          }
+                                                                          PostulationModel
+                                                                              postulation =
+                                                                              PostulationModel(
+                                                                            level:
+                                                                                level,
+                                                                            grade:
+                                                                                grade,
+                                                                            institutional_unit:
+                                                                                schoolController.text.trim(),
+                                                                            city:
+                                                                                cityController.text.trim(),
+                                                                            amount_brothers:
+                                                                                0,
+                                                                            student_name:
+                                                                                studentNameController.text.trim(),
+                                                                            student_lastname:
+                                                                                studentLastnameController.text.trim(),
+                                                                            student_ci:
+                                                                                '$foreign${studentCIController.text.trim()} ${complementController.text.trim()}'.trim(),
+                                                                            birth_day:
+                                                                                birth_day,
+                                                                            gender:
+                                                                                gender,
+                                                                            father_name:
+                                                                                fatherNameController.text.trim(),
+                                                                            father_lastname:
+                                                                                fatherLastnameController.text.trim(),
+                                                                            father_cellphone:
+                                                                                fatherCellphoneController.text.trim(),
+                                                                            mother_name:
+                                                                                motherNameController.text.trim(),
+                                                                            mother_lastname:
+                                                                                motherLastnameController.text.trim(),
+                                                                            mother_cellphone:
+                                                                                motherCellphoneController.text.trim(),
+                                                                            telephone:
+                                                                                phoneController.text.trim(),
+                                                                            email:
+                                                                                emailController.text.trim(),
+                                                                            interview_date:
+                                                                                selectedDay,
+                                                                            interview_hour:
+                                                                                selectedHour,
+                                                                            userID:
+                                                                                "0",
+                                                                            status:
+                                                                                'Aprobado',
+                                                                            latitude:
+                                                                                _markerInfoLati,
+                                                                            longitude:
+                                                                                _markerInfoLong,
+                                                                            register_date:
+                                                                                DateTime.now(),
+                                                                            hermanosUEE: [
+                                                                              'Carlos',
+                                                                              'Ana',
+                                                                            ],
+                                                                            nombreHermano: [
+                                                                              'Carlos',
+                                                                              'Ana',
+                                                                            ],
+                                                                            obs:
+                                                                                'ver',
+                                                                            fechaEntrevista:
+                                                                                DateTime.timestamp(),
+                                                                            psicologoEncargado:
+                                                                                'ver',
+                                                                            informeBreveEntrevista:
+                                                                                'ver',
+                                                                            recomendacionPsicologia:
+                                                                                'ver',
+                                                                            respuestaPPFF:
+                                                                                'ver',
+                                                                            fechaEntrevistaCoordinacion:
+                                                                                DateTime.timestamp(),
+                                                                            vistoBuenoCoordinacion:
+                                                                                'ver',
+                                                                            respuestaAPpff:
+                                                                                'ver',
+                                                                            administracion:
+                                                                                'ver',
+                                                                            recepcionDocumentos:
+                                                                                'ver',
+                                                                            estadoEntrevistaPsicologia:
+                                                                                'ver',
+                                                                            estadoGeneral:
+                                                                                'ver',
+                                                                            estadoConfirmacion:
+                                                                                'ver',
+                                                                            reasonRescheduleAppointment:
+                                                                                '',
+                                                                            reasonMissAppointment:
+                                                                                '',
+                                                                            estadoConfirmacionAdmin:
+                                                                                'Aprobado',
+                                                                            approvedAdm:
+                                                                                '',
+                                                                            fechaEntrevistaAdministracion:
+                                                                                DateTime.now(),
+                                                                            horaEntrevistaAdministracion:
+                                                                                '',
+                                                                          );
 
-                                      if (pickedDate.isAtSameMomentAs(
-                                          justDate)) {
-                                        dateController.text = '';
+                                                                          //crear usuario
+                                                                          crearUsuario(
+                                                                              postulation);
+                                                                          enviarNotificacionAprovado(
+                                                                              postulation);
+                                                                          // ignore: use_build_context_synchronously
+                                                                          Navigator.of(context)
+                                                                              .pop();
+                                                                          // ignore: use_build_context_synchronously
+                                                                          showMessageDialog(
+                                                                              context,
+                                                                              'assets/ui/marque-el-circulo.png',
+                                                                              'Correcto',
+                                                                              'Postulación aprobada');
+                                                                          if (postulation.userID ==
+                                                                              '0') {
+                                                                            // ignore: use_build_context_synchronously
+                                                                            showMessageDialog(
+                                                                                context,
+                                                                                'assets/ui/marque-el-circulo.png',
+                                                                                'Datos de usuarios',
+                                                                                (fatherUserName != '' ? 'Usuario del padre: $fatherUserName \nContraseña del padre: $fatherPassword\n' : '') + (motherUserName != '' ? 'Usuario de la madre: $motherUserName \nContraseña de la madre: $motherPassword' : ''));
+                                                                          }
+
+                                                                          setState(
+                                                                              () {});
+                                                                        } catch (e) {
+                                                                          // ignore: use_build_context_synchronously
+                                                                          showMessageDialog(
+                                                                              context,
+                                                                              'assets/ui/circulo-cruzado.png',
+                                                                              'Error',
+                                                                              'Ha ocurrido un error inesperado');
+                                                                        }
+                                                                        setState(
+                                                                            () {});
+                                                                      },
+                                                                      style: ButtonStyle(
+                                                                          backgroundColor: MaterialStateProperty.all(const Color(
+                                                                              0xFF044086))),
+                                                                      child: const Text(
+                                                                          'Si',
+                                                                          style:
+                                                                              TextStyle(color: Colors.white))),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      left: 5,
+                                                                      right: 5),
+                                                              child:
+                                                                  ElevatedButton(
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.of(context)
+                                                                            .pop();
+                                                                      },
+                                                                      style: ButtonStyle(
+                                                                          backgroundColor: MaterialStateProperty.all(const Color(
+                                                                              0xFF044086))),
+                                                                      child: const Text(
+                                                                          'No',
+                                                                          style:
+                                                                              TextStyle(color: Colors.white))),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                  );
+                                                });
+                                          } else {
+                                            showMessageDialog(
+                                                context,
+                                                'assets/ui/circulo-cruzado.png',
+                                                'Error',
+                                                'No olvide seleccionar una fecha para la entrevista');
+                                          }
+                                        } else {
+                                          showMessageDialog(
+                                              context,
+                                              'assets/ui/circulo-cruzado.png',
+                                              'Error',
+                                              'El correo no tiene un formato valido');
+                                        }
                                       } else {
-                                        String formattedDate =
-                                        DateFormat('dd/MM/yyyy')
-                                            .format(pickedDate);
-                                        dateController.text =
-                                            formattedDate.toString();
-                                      }
-                                    } else {
-                                      if (dateController.text == '') {
-                                        // ignore: use_build_context_synchronously
                                         showMessageDialog(
                                             context,
                                             'assets/ui/circulo-cruzado.png',
                                             'Error',
-                                            'Debe marcar una fecha');
+                                            'Debe llenar todos los campos de padre o madre');
                                       }
-                                    }
-                                    setState(() {});
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Padre',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Color(0xFF044086),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              children: [
-                                CustomTextField(
-                                  label: 'Nombres',
-                                  controller: fatherNameController,
-                                  maxLength: 40,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(
-                                            r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(r'\s\s+')),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                CustomTextField(
-                                  label: 'Número de celular',
-                                  controller:
-                                  fatherCellphoneController,
-                                  maxLength: 12,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.allow(
-                                        RegExp(r'[0-9]')),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 25,
-                          ),
-                          Expanded(
-                            child: CustomTextField(
-                              label: 'Apellidos',
-                              controller: fatherLastnameController,
-                              maxLength: 40,
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(
-                                        r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r'\s\s+')),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Madre',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Color(0xFF044086),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              children: [
-                                CustomTextField(
-                                  label: 'Nombres',
-                                  controller: motherNameController,
-                                  maxLength: 40,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(
-                                            r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                    FilteringTextInputFormatter.deny(
-                                        RegExp(r'\s\s+')),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                CustomTextField(
-                                  label: 'Número de celular',
-                                  controller:
-                                  motherCellphoneController,
-                                  maxLength: 12,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.allow(
-                                        RegExp(r'[0-9]')),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 25,
-                          ),
-                          Expanded(
-                            child: CustomTextField(
-                              label: 'Apellidos',
-                              controller: motherLastnameController,
-                              maxLength: 40,
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(
-                                        r'[^A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]')),
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r'\s\s+')),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Datos de contacto',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Color(0xFF044086),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: CustomTextField(
-                              label: 'Teléfono',
-                              controller: phoneController,
-                              maxLength: 10,
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.allow(
-                                    RegExp(r'[0-9]')),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 25,
-                          ),
-                          Expanded(
-                            child: CustomTextField(
-                              label: 'Correo electrónico',
-                              controller: emailController,
-                              maxLength: 30,
-                              inputFormatters: <TextInputFormatter>[
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r"[&=_\s\'\-+,<>]")),
-                                FilteringTextInputFormatter.deny(
-                                    RegExp(r'\.\.+')),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Direccion geografica del estudiante',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Color(0xFF044086),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Ubicacion : *", style: TextStyle(fontSize: 15, color: Colors.blue[900])),
-                                SizedBox(
-                                  width:  300  ,
-                                  height:  500  ,
-                                  child: Container(
-                                    color: Colors.blue,
-                                    child: GoogleMap(
-
-                                      initialCameraPosition: CameraPosition(
-                                        target: _initialPosition,
-                                        zoom: 12,
-                                      ),
-                                      onTap: _onMapTapped,
-                                      markers: _markers,
-                                      mapType: MapType.none,
-                                      onMapCreated: _onMapCreated,
-                                      onCameraMove: _onCameraMove,
-                                      minMaxZoomPreference: MinMaxZoomPreference(12, 18),
-
-                                    ),
-                                  ),
-                                ),
-                                // ElevatedButton(
-                                //   onPressed: () {
-                                //     setState(() {
-                                //       _expanded = !_expanded;
-                                //     });
-                                //   },
-                                //   child: Text(_expanded ? 'Restaurar' : 'Expandir'),
-                                // ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _centerMapOnCochabamba();
-                                    });
-                                  },
-                                  child: Text('Centrar en Cbba'),
-                                ),
-
-
-
-                              ]
-                          )
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        children: [
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Fecha de entrevista',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  color: Color(0xFF044086),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                              icon: Image.asset(
-                                'assets/ui/interrogatorio.png',
-                                width: 20,
-                              ),
-                              onPressed: () {
-                                needColorHelp = !needColorHelp;
-                                setState(() {});
-                              }
-                          ),
-                        ],
-                      ),
-                      if(needColorHelp)
-                        Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 60.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10.0),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  spreadRadius: 1,
-                                  blurRadius: 1,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            child: const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment:CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Significado de los colores',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(color: Color(0xFF044086), fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 5,),
-                                ColorHelp(color: Color(0x5F9E9E9E), text: 'No disponible'),
-                                SizedBox(height: 5,),
-                                ColorHelp(color: Color(0xFF9E9E9E), text: 'Disponible'),
-                                SizedBox(height: 5,),
-                                ColorHelp(color: Color(0xFFd9534f), text: 'Ocupado'),
-                                SizedBox(height: 5,),
-                                ColorHelp(color: Color(0xFF198754), text: 'Seleccionado'),
-                                SizedBox(height: 5,),
-                              ],
-                            )
-                        ),
-                      const SizedBox(height: 10,),
-                      if (selectedHour.isNotEmpty)
-                        Align(
-                          alignment: Alignment.topCenter,
-                          child: Text(
-                            ('${DateFormat('dd/MM/yyyy').format(selectedDay)} $selectedHour'),
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                                color: Color(0xFF044086),
-                                fontSize: 18),
-                          ),
-                        ),
-                      SizedBox(
-                        child: CarouselSlider.builder(
-                          carouselController: _carouselController,
-                          itemCount: weeks.length,
-                          itemBuilder:
-                              (context, carouselIndex, realIndex) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                BorderRadius.circular(10.0),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color:
-                                    Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 1,
-                                    blurRadius: 1,
-                                  ),
-                                ],
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: GridView.builder(
-                                  gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 6,
-                                    childAspectRatio: 1.5,
-                                    mainAxisSpacing: 10.0,
-                                    crossAxisSpacing: 10.0,
-                                  ),
-                                  itemBuilder: (context, gridIndex) {
-                                    int rowIndex = gridIndex ~/ 6;
-                                    int columnIndex = gridIndex % 6;
-
-                                    if (columnIndex == 0) {
-                                      return Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                        children: [
-                                          Text(times[rowIndex],
-                                              style: const TextStyle(
-                                                  fontWeight:
-                                                  FontWeight.bold,
-                                                  color: Color(
-                                                      0xFF044086))),
-                                          if (rowIndex != 0)
-                                            const VerticalDivider(),
-                                        ],
-                                      );
                                     } else {
-                                      if (rowIndex == 0) {
-                                        DateTime day =
-                                        weeks[carouselIndex]
-                                        [columnIndex - 1];
-                                        return Column(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment
-                                              .center,
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment
-                                              .center,
-                                          children: [
-                                            Text(
-                                                DateFormat(
-                                                    'E', 'ES_es')
-                                                    .format(day),
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                    FontWeight
-                                                        .bold,
-                                                    color: Color(
-                                                        0xFF044086))),
-                                            Text(
-                                                DateFormat('d MMM',
-                                                    'ES_es')
-                                                    .format(day),
-                                                style: const TextStyle(
-                                                    fontWeight:
-                                                    FontWeight
-                                                        .bold,
-                                                    color: Color(
-                                                        0xFF044086))),
-                                            const Divider(
-                                              height: 2,
-                                            ),
-                                          ],
-                                        );
-                                      } else {
-                                        DateTime day =
-                                        weeks[carouselIndex]
-                                        [columnIndex - 1];
-                                        String formattedDay =
-                                        DateFormat(
-                                            'EEEE', 'ES_es')
-                                            .format(day)
-                                            .toLowerCase();
-                                        bool isSelected =
-                                            selectedDay == day &&
-                                                selectedHour ==
-                                                    times[rowIndex];
-
-                                        int status = postulationsList.any((d) =>
-                                        DateTime(
-                                            d.interview_date
-                                                .year,
-                                            d.interview_date
-                                                .month,
-                                            d.interview_date
-                                                .day) ==
-                                            day &&
-                                            d.interview_hour ==
-                                                times[rowIndex])
-                                            ? 1
-                                            : 2;
-
-                                        if (endDate.isBefore(day) ||
-                                            startDate.isAfter(day) ||
-                                            !days.any((d) =>
-                                            d.toLowerCase() ==
-                                                formattedDay)) {
-                                          status = 0;
-                                        }
-
-                                        return HourButton(
-                                          isSelected: isSelected,
-                                          status: status,
-                                          onTap: () {
-                                            if (status == 2) {
-                                              selectedDay = day;
-                                              selectedHour =
-                                              times[rowIndex];
-                                              setState(() {});
-                                            }
-                                          },
-                                        );
-                                      }
+                                      showMessageDialog(
+                                          context,
+                                          'assets/ui/circulo-cruzado.png',
+                                          'Error',
+                                          'No debe dejar campos vacios');
                                     }
                                   },
-                                  itemCount: times.length * 6,
+                                  child: const Text('Enviar',
+                                      style: TextStyle(color: Colors.white)),
                                 ),
-                              ),
-                            );
-                          },
-                          options: CarouselOptions(
-                            enlargeCenterPage: true,
-                            enableInfiniteScroll: false,
-                            viewportFraction: 0.8,
-                          ),
-                        ),
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back),
-                            onPressed: () {
-                              _carouselController.previousPage();
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.arrow_forward),
-                            onPressed: () {
-                              _carouselController.nextPage();
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              const Color(0xFF044086)),
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5),
+                              ],
                             ),
                           ),
                         ),
-                        onPressed: () async {
-                          final bool emailValid = RegExp(
-                              r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-                              .hasMatch(emailController.text);
-                          if (areAllFieldsFilled()) {
-                            if ((fatherCellphoneController.text != '' && fatherLastnameController.text != '' && fatherNameController.text != '') || (motherCellphoneController.text != '' && motherLastnameController.text != '' && motherNameController.text != '')) {
-                              if (emailValid) {
-                                if (selectedHour.trim().isNotEmpty) {
-                                  showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          alignment: Alignment.center,
-                                          content: Column(
-                                            mainAxisSize:
-                                            MainAxisSize.min,
-                                            children: [
-                                              const Text(
-                                                  '¿Estás seguro de que quieres enviar el formulario?',
-                                                  textAlign:
-                                                  TextAlign.center,
-                                                  style: TextStyle(
-                                                      color: Color(
-                                                          0xFF3D5269),
-                                                      fontWeight:
-                                                      FontWeight
-                                                          .bold,
-                                                      fontSize: 18)),
-                                              const SizedBox(
-                                                height: 10,
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .center,
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment
-                                                    .center,
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                    const EdgeInsets
-                                                        .only(
-                                                        left: 5,
-                                                        right: 5),
-                                                    child:
-                                                    ElevatedButton(
-                                                        onPressed:
-                                                            () async {
-                                                          DateFormat
-                                                          format =
-                                                          DateFormat(
-                                                              "dd/MM/yyyy");
-                                                          DateTime
-                                                          birth_day =
-                                                          format
-                                                              .parse(dateController.text);
-                                                          try {
-                                                            if(fatherCellphoneController.text == '' || fatherLastnameController.text == '' || fatherNameController.text == ''){
-                                                              fatherCellphoneController.text = '';
-                                                              fatherLastnameController.text = '';
-                                                              fatherNameController.text = '';
-                                                            }
-                                                            if(motherCellphoneController.text == '' || motherLastnameController.text == '' || motherNameController.text == ''){
-                                                              motherCellphoneController.text = '';
-                                                              motherLastnameController.text = '';
-                                                              motherNameController.text = '';
-                                                            }
-                                                            PostulationModel postulation = PostulationModel(
-                                                                level:
-                                                                level,
-                                                                grade:
-                                                                grade,
-                                                                institutional_unit: schoolController.text
-                                                                    .trim(),
-                                                                city: cityController.text
-                                                                    .trim(),
-                                                                amount_brothers:
-                                                                0,
-                                                                student_name: studentNameController.text
-                                                                    .trim(),
-                                                                student_lastname: studentLastnameController.text
-                                                                    .trim(),
-                                                                student_ci: '$foreign${studentCIController.text.trim()} ${complementController.text.trim()}'.trim(),
-                                                                birth_day:
-                                                                birth_day,
-                                                                gender:
-                                                                gender,
-                                                                father_name: fatherNameController.text
-                                                                    .trim(),
-                                                                father_lastname: fatherLastnameController.text
-                                                                    .trim(),
-                                                                father_cellphone: fatherCellphoneController.text
-                                                                    .trim(),
-                                                                mother_name: motherNameController.text
-                                                                    .trim(),
-                                                                mother_lastname: motherLastnameController.text
-                                                                    .trim(),
-                                                                mother_cellphone: motherCellphoneController.text
-                                                                    .trim(),
-                                                                telephone: phoneController.text
-                                                                    .trim(),
-                                                                email: emailController.text
-                                                                    .trim(),
-                                                                interview_date:
-                                                                selectedDay,
-                                                                interview_hour:
-                                                                selectedHour,
-                                                                userID:
-                                                                "0",
-                                                                status: 'Aprobado',
-                                                                latitude: _markerInfoLati,
-                                                                longitude: _markerInfoLong,
-                                                                register_date: DateTime.now(),
-
-                                                                hermanosUEE: [
-                                                                  'Carlos',
-                                                                  'Ana',
-                                                                ],
-                                                                nombreHermano: [
-                                                                  'Carlos',
-                                                                  'Ana',
-                                                                ],
-                                                                obs: 'ver',
-                                                                fechaEntrevista: DateTime.timestamp(),
-                                                                psicologoEncargado: 'ver',
-                                                                informeBreveEntrevista: 'ver',
-                                                                recomendacionPsicologia: 'ver',
-                                                                respuestaPPFF: 'ver',
-                                                                fechaEntrevistaCoordinacion: DateTime.timestamp(),
-                                                                vistoBuenoCoordinacion: 'ver',
-                                                                respuestaAPpff: 'ver',
-                                                                administracion: 'ver',
-                                                                recepcionDocumentos: 'ver',
-                                                                estadoEntrevistaPsicologia: 'ver',
-                                                                estadoGeneral: 'ver',
-                                                                estadoConfirmacion: 'ver',
-                                                                reasonRescheduleAppointment: '',
-                                                                reasonMissAppointment: '',
-                                                                estadoConfirmacionAdmin: 'Aprobado',
-                                                                approvedAdm: '',
-                                                                fechaEntrevistaAdministracion: DateTime.now(),
-                                                                horaEntrevistaAdministracion: '',
-                                                                );
-
-
-                                                            //crear usuario
-                                                            crearUsuario(
-                                                                postulation);
-                                                            enviarNotificacionAprovado(
-                                                                postulation);
-                                                            // ignore: use_build_context_synchronously
-                                                            Navigator.of(
-                                                                context)
-                                                                .pop();
-                                                            // ignore: use_build_context_synchronously
-                                                            showMessageDialog(
-                                                                context,
-                                                                'assets/ui/marque-el-circulo.png',
-                                                                'Correcto',
-                                                                'Postulación aprobada');
-                                                            if (postulation
-                                                                .userID ==
-                                                                '0') {
-                                                              // ignore: use_build_context_synchronously
-                                                              showMessageDialog(
-                                                                  context,
-                                                                  'assets/ui/marque-el-circulo.png',
-                                                                  'Datos de usuarios',
-                                                                  (fatherUserName != ''
-                                                                      ? 'Usuario del padre: $fatherUserName \nContraseña del padre: $fatherPassword\n'
-                                                                      : '') +
-                                                                      (motherUserName != ''
-                                                                          ? 'Usuario de la madre: $motherUserName \nContraseña de la madre: $motherPassword'
-                                                                          : ''));
-                                                            }
-
-                                                            setState(() {});
-
-                                                          } catch (e) {
-                                                            // ignore: use_build_context_synchronously
-                                                            showMessageDialog(
-                                                                context,
-                                                                'assets/ui/circulo-cruzado.png',
-                                                                'Error',
-                                                                'Ha ocurrido un error inesperado');
-                                                          }
-                                                          setState(
-                                                                  () {});
-                                                        },
-                                                        style: ButtonStyle(
-                                                            backgroundColor:
-                                                            MaterialStateProperty.all(const Color(
-                                                                0xFF044086))),
-                                                        child: const Text(
-                                                            'Si',
-                                                            style: TextStyle(
-                                                                color:
-                                                                Colors.white))),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                    const EdgeInsets
-                                                        .only(
-                                                        left: 5,
-                                                        right: 5),
-                                                    child:
-                                                    ElevatedButton(
-                                                        onPressed:
-                                                            () {
-                                                          Navigator.of(
-                                                              context)
-                                                              .pop();
-                                                        },
-                                                        style: ButtonStyle(
-                                                            backgroundColor:
-                                                            MaterialStateProperty.all(const Color(
-                                                                0xFF044086))),
-                                                        child: const Text(
-                                                            'No',
-                                                            style: TextStyle(
-                                                                color:
-                                                                Colors.white))),
-                                                  ),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        );
-                                      });
-                                } else {
-                                  showMessageDialog(
-                                      context,
-                                      'assets/ui/circulo-cruzado.png',
-                                      'Error',
-                                      'No olvide seleccionar una fecha para la entrevista');
-                                }
-                              } else {
-                                showMessageDialog(
-                                    context,
-                                    'assets/ui/circulo-cruzado.png',
-                                    'Error',
-                                    'El correo no tiene un formato valido');
-                              }
-                            }
-                            else{
-                              showMessageDialog(
-                                  context,
-                                  'assets/ui/circulo-cruzado.png',
-                                  'Error',
-                                  'Debe llenar todos los campos de padre o madre');
-                            }
-                          } else {
-                            showMessageDialog(
-                                context,
-                                'assets/ui/circulo-cruzado.png',
-                                'Error',
-                                'No debe dejar campos vacios');
-                          }
-                        },
-                        child: const Text('Enviar',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
-              ),
-            );
-          },
-        ),
-      ),
     );
   }
-
 
   void enviarNotificacionConfirmado(PostulationModel postulation) async {
     //recuperar id persona
@@ -1543,7 +1638,7 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
         title: 'Entrevista confirmada',
         deviceToken: userToken,
         content:
-        'En fecha: ${postulation.interview_date.day} del ${postulation.interview_date.month} de ${postulation.interview_date.year}, se se confima la entrevista para el estudiante: ${postulation.student_name} ${postulation.student_lastname}',
+            'En fecha: ${postulation.interview_date.day} del ${postulation.interview_date.month} de ${postulation.interview_date.year}, se se confima la entrevista para el estudiante: ${postulation.student_name} ${postulation.student_lastname}',
         userId: postulation.userID,
         registerDate: DateTime.now());
     print(notification.content.toString());
@@ -1576,7 +1671,7 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
         title: 'Proceso de registro al sistema finalizado',
         deviceToken: userToken,
         content:
-        'El estudiante ${postulation.student_name} ${postulation.student_lastname} fue registrado en el sistema',
+            'El estudiante ${postulation.student_name} ${postulation.student_lastname} fue registrado en el sistema',
         userId: postulation.userID,
         registerDate: DateTime.now());
     print(notification.content.toString());
@@ -1622,11 +1717,11 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
       //padreid= consultaridpadreconSegunmadreID(motherId)
       //caso1 madreid exisite entonces se busca padreid mediante llave compartida,sacamos id de padre y lo inswertamos en en fatherid
       refId = new PersonaDataSourceImpl();
-      if(fatherId=='None'){
-        fatherId  =await refId.getFatherReference(motherId);
+      if (fatherId == 'None') {
+        fatherId = await refId.getFatherReference(motherId);
       }
-      if(motherId=='None'){
-        motherId  =await refId.getMotherReference(fatherId);
+      if (motherId == 'None') {
+        motherId = await refId.getMotherReference(fatherId);
       }
       Future.delayed(Duration(seconds: 2), () async {
         PersonaModel estudiante = PersonaModel(
@@ -1691,7 +1786,7 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
 
 // Validar si hay al menos dos apellidos
       String secondApellido =
-      fatherApellidos.length > 1 ? fatherApellidos[1] : '';
+          fatherApellidos.length > 1 ? fatherApellidos[1] : '';
 
 // Validar si el segundo apellido está vacío
       if (secondApellido.isEmpty) {
@@ -1702,9 +1797,9 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
 
 // Crear el nombre de usuario y contraseña
       fatherUserName =
-      "${postulation.father_name.substring(0, 3)}${fatherApellidos[0].substring(0, 2)}${secondApellido.substring(0, 2)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
+          "${postulation.father_name.substring(0, 3)}${fatherApellidos[0].substring(0, 2)}${secondApellido.substring(0, 2)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
       fatherPassword =
-      "${postulation.father_lastname.substring(0, 3)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
+          "${postulation.father_lastname.substring(0, 3)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
 
       // if (!secondApellido.isEmpty) {
       // Encriptar la contraseña con SHA-256
@@ -1735,10 +1830,6 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
         updatedate: DateTime.now(),
       );
 
-
-
-
-
       // Generar nombre de usuario y contraseña
 
       //List<String> motherApellidos = postulation.mother_lastname.split(' ');
@@ -1751,7 +1842,7 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
 
 // Validar si hay al menos dos apellidos
       String secondApellidomother =
-      motherApellidos.length > 1 ? motherApellidos[1] : '';
+          motherApellidos.length > 1 ? motherApellidos[1] : '';
 
 // Validar si el segundo apellido está vacío
       if (secondApellidomother.isEmpty) {
@@ -1762,9 +1853,9 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
 
 // Crear el nombre de usuario y contraseña
       motherUserName =
-      "${postulation.mother_name.substring(0, 3)}${motherApellidos[0].substring(0, 2)}${secondApellidomother.substring(0, 2)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
+          "${postulation.mother_name.substring(0, 3)}${motherApellidos[0].substring(0, 2)}${secondApellidomother.substring(0, 2)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
       motherPassword =
-      "${postulation.mother_lastname.substring(0, 3)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
+          "${postulation.mother_lastname.substring(0, 3)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}${Random().nextInt(9)}";
 
       // Encriptar la contraseña con SHA-256
       String encryptedMotherPassword = hashPassword(motherPassword);
@@ -1807,8 +1898,6 @@ class _RegisterPostulationHardCoded extends State<RegisterPostulationHardCoded> 
     var digest = sha256.convert(bytes);
     return digest.toString();
   }
-
-
 }
 
 class HourButton extends StatelessWidget {
@@ -1827,10 +1916,10 @@ class HourButton extends StatelessWidget {
     return status == 0
         ? const Color.fromARGB(95, 158, 158, 158)
         : status == 1
-        ? const Color(0xFFd9534f)
-        : isSelected
-        ? const Color(0xFF198754)
-        : const Color(0xFF9E9E9E);
+            ? const Color(0xFFd9534f)
+            : isSelected
+                ? const Color(0xFF198754)
+                : const Color(0xFF9E9E9E);
   }
 
   @override
@@ -1839,7 +1928,7 @@ class HourButton extends StatelessWidget {
       onTap: onTap,
       child: MouseRegion(
         cursor:
-        status < 2 ? SystemMouseCursors.basic : SystemMouseCursors.click,
+            status < 2 ? SystemMouseCursors.basic : SystemMouseCursors.click,
         child: Container(
             margin: const EdgeInsets.all(2),
             decoration: BoxDecoration(
@@ -1849,7 +1938,6 @@ class HourButton extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class ColorHelp extends StatelessWidget {
@@ -1873,14 +1961,9 @@ class ColorHelp extends StatelessWidget {
             decoration: BoxDecoration(
               color: color,
               borderRadius: BorderRadius.circular(5),
-            )
-        ),
+            )),
         Text(text)
       ],
     );
-
-
   }
-
-
 }
